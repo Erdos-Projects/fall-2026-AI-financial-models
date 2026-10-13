@@ -1,0 +1,10 @@
+name: erdos-financial-models
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  # Python 3.11 supports the Intel macOS PyTorch wheel used below.
+  - python=3.11
+  - pip>=24
+  - pip:
+      - -r requirements.txt

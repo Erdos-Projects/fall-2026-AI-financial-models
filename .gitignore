@@ -1,0 +1,85 @@
+# Downloaded market data and generated datasets (keep small references tracked).
+/Nifty Options Data/**
+!/Nifty Options Data/README.md
+!/Nifty Options Data/schema.json
+/data/raw/**
+!/data/raw/.gitkeep
+!/data/raw/README.md
+/data/interim/**
+!/data/interim/.gitkeep
+!/data/interim/README.md
+/data/processed/**
+!/data/processed/.gitkeep
+!/data/processed/README.md
+
+# Generated arrays, model weights, and binary experiment artifacts.
+# Do not ignore entire studies/, runs/, or reports/ trees: preserve reports,
+# protocols, configs, small JSON/CSV results, and provenance files.
+*.npy
+*.npz
+*.parquet
+*.feather
+*.arrow
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+*.pickle
+*.joblib
+!/data/reference/**/
+!/data/reference/**
+!/tests/fixtures/**/
+!/tests/fixtures/**
+
+# Apply local-environment, cache, and credential rules after fixture exceptions.
+/.conda/
+/.venv/
+/venv/
+/env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+/build/
+/dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.cache/
+.ipynb_checkpoints/
+.jupyter/
+
+# Credentials and local settings; sanitized templates can be committed.
+.env
+.env.*
+!.env.example
+!.env.*.example
+.envrc
+/.aws/
+/.codex/auth.json
+/.codex/config.toml
+
+# Runtime logs; structured experiment records elsewhere remain trackable.
+/logs/
+/wandb/
+/mlruns/
+events.out.tfevents.*
+
+# macOS and editor-local files
+.DS_Store
+._*
+__MACOSX/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

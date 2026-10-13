@@ -1,0 +1,924 @@
+{
+  "analysis_version": 1,
+  "input_inventory_sha256": "bab83c37f9fba066ce8cc3f94300a2066a0d83956d3a722a2e5351b86690f800",
+  "selected_files": 3137,
+  "selected_rows": 17611169,
+  "first_timestamp": "2016-12-14 09:15:00",
+  "last_timestamp": "2020-12-31 15:29:00",
+  "observed_dates": 1004,
+  "source_file_days": 86506,
+  "quality_counts": {
+    "rows": 17611169,
+    "missing_open": 0,
+    "invalid_numeric_open": 0,
+    "nonfinite_open": 0,
+    "missing_high": 0,
+    "invalid_numeric_high": 0,
+    "nonfinite_high": 0,
+    "missing_low": 0,
+    "invalid_numeric_low": 0,
+    "nonfinite_low": 0,
+    "missing_close": 0,
+    "invalid_numeric_close": 0,
+    "nonfinite_close": 0,
+    "missing_volume": 0,
+    "invalid_numeric_volume": 0,
+    "nonfinite_volume": 0,
+    "missing_extra_field_9": 14979866,
+    "invalid_numeric_extra_field_9": 0,
+    "nonfinite_extra_field_9": 0,
+    "invalid_timestamp": 0,
+    "unparsed_symbol": 0,
+    "negative_price": 0,
+    "zero_close": 0,
+    "nonpositive_close": 0,
+    "close_at_most_1": 491095,
+    "negative_volume": 0,
+    "zero_volume": 396423,
+    "noninteger_volume": 0,
+    "negative_extra_field_9": 0,
+    "ohlc_inconsistent": 2952,
+    "flat_ohlc": 3347179,
+    "outside_reference_session": 34662,
+    "weekend_observation": 24493,
+    "exact_duplicate_extra": 0,
+    "duplicate_source_timestamp_extra": 0,
+    "out_of_order_step": 0,
+    "has_encoded_expiry_candidate": 263423,
+    "filename_symbol_mismatch": 0,
+    "valid_one_min_return": 15081715,
+    "unchanged_one_min_close": 1730296,
+    "absolute_one_min_log_return_over_log2": 9099
+  },
+  "all_source_days_regular_minutes": {
+    "count": 86506,
+    "min": 0.0,
+    "max": 375.0,
+    "mean": 203.18251913162092,
+    "std": 147.360383919956,
+    "p01": 1.0,
+    "p25": 43.0,
+    "median": 219.0,
+    "p75": 365.0,
+    "p99": 375.0
+  },
+  "candidate_key_collisions_within_archive": {
+    "candidate_groups": 0,
+    "rows_in_candidates": 0,
+    "excess_rows_if_naively_deduplicated": 0,
+    "groups_with_different_values": 0,
+    "groups_across_source_files": 0
+  },
+  "date_type_strike_groups_in_multiple_archive_cohorts": 23100,
+  "date_type_strike_groups_total": 61336,
+  "sample": {
+    "method": "uniform independent random priorities; retain globally smallest priorities",
+    "rows": 100000,
+    "seed": 20261012
+  },
+  "reference_session": {
+    "start": "09:15",
+    "end_exclusive": "15:30",
+    "minute_slots": 375,
+    "status": "diagnostic reference only; vendor timestamp convention and special sessions unverified"
+  },
+  "numeric_summary_basis": "exact frequencies across all selected rows, including flagged rows; invalid numeric values are missing; physical format copies excluded",
+  "expiry_status": "encoded symbol dates preserved only where present; no calendar-derived expiry assigned",
+  "source_fields": [
+    "symbol",
+    "date",
+    "time",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "extra_field_9"
+  ],
+  "extra_field_9_status": "unverified meaning; resembles open interest, not confirmed",
+  "figures": [
+    "01_monthly_coverage.png",
+    "02_call_put_coverage.png",
+    "03_price_volume_distributions.png",
+    "04_intraday_activity.png",
+    "05_minute_density.png",
+    "06_schema_change.png",
+    "07_intraday_gaps.png"
+  ],
+  "inventory_summary": {
+    "generated_at_utc": "2026-10-12T16:43:09.087160+00:00",
+    "raw_root": "Nifty Options Data",
+    "method": {
+      "source_mutations": "none",
+      "pair_key": "archive_year/archive_month/file_stem (case sensitive)",
+      "selection": "One file per unique hash within a pair key, CSV preferred, TXT fallback; conflicting bytes are retained and flagged for review.",
+      "hash": "SHA256 of exact raw bytes, used only to compare representations of a pair key.",
+      "row_count": "Nonempty physical lines; field count is commas + 1 for observed unquoted headerless records.",
+      "archive_month_caveat": "Archive month is provenance and has not been asserted to be an expiry date.",
+      "ninth_column_caveat": "The ninth field has no supplied vendor schema; its meaning is unverified.",
+      "cross_id_hash_caveat": "Equal content across different canonical IDs is retained; do not deduplicate contracts by hash."
+    },
+    "physical_files": 5682,
+    "physical_bytes": 1727483939,
+    "physical_nonempty_rows": 30280099,
+    "physical_suffix_counts": {
+      ".txt": 3137,
+      ".csv": 2545
+    },
+    "selected_files": 3137,
+    "canonical_groups": 3137,
+    "selected_bytes": 995943892,
+    "selected_nonempty_rows": 17611169,
+    "excluded_identical_representation_files": 2545,
+    "excluded_identical_representation_rows": 12668930,
+    "excluded_identical_representation_bytes": 731540047,
+    "exclusion_note": "Excluded from the analysis selection only; original files remain untouched.",
+    "selected_suffix_counts": {
+      ".txt": 592,
+      ".csv": 2545
+    },
+    "selected_row_field_counts": {
+      "8": 14979866,
+      "9": 2631303
+    },
+    "selected_symbol_style_row_counts": {
+      "option_type_space_strike": 6931814,
+      "nifty_strike_option_type": 10415932,
+      "nifty_date_token_strike_option_type": 263423
+    },
+    "pair_status_group_counts": {
+      "txt_only": 592,
+      "csv_txt_identical": 2545
+    },
+    "selection_needs_review_groups": [],
+    "same_format_multiple_file_groups": [],
+    "zero_nonempty_line_files": [],
+    "multi_symbol_files": [],
+    "mixed_field_width_files": [],
+    "cross_canonical_identical_hash_groups": 0,
+    "cross_canonical_identical_hash_examples": {},
+    "missing_archive_months_inside_observed_years": [
+      "2018-01"
+    ],
+    "monthly": [
+      {
+        "archive_year": 2017,
+        "archive_month": 1,
+        "physical_files": 34,
+        "selected_files": 34,
+        "physical_bytes": 13043573,
+        "selected_bytes": 13043573,
+        "physical_nonempty_rows": 251282,
+        "selected_nonempty_rows": 251282,
+        "selected_row_field_counts": {
+          "8": 251282
+        },
+        "pair_status_groups": {
+          "txt_only": 34
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 2,
+        "physical_files": 32,
+        "selected_files": 32,
+        "physical_bytes": 9250204,
+        "selected_bytes": 9250204,
+        "physical_nonempty_rows": 177723,
+        "selected_nonempty_rows": 177723,
+        "selected_row_field_counts": {
+          "8": 177723
+        },
+        "pair_status_groups": {
+          "txt_only": 32
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 3,
+        "physical_files": 26,
+        "selected_files": 26,
+        "physical_bytes": 10894833,
+        "selected_bytes": 10894833,
+        "physical_nonempty_rows": 207807,
+        "selected_nonempty_rows": 207807,
+        "selected_row_field_counts": {
+          "8": 207807
+        },
+        "pair_status_groups": {
+          "txt_only": 26
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 4,
+        "physical_files": 36,
+        "selected_files": 36,
+        "physical_bytes": 14755248,
+        "selected_bytes": 14755248,
+        "physical_nonempty_rows": 284747,
+        "selected_nonempty_rows": 284747,
+        "selected_row_field_counts": {
+          "8": 284747
+        },
+        "pair_status_groups": {
+          "txt_only": 36
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 5,
+        "physical_files": 22,
+        "selected_files": 22,
+        "physical_bytes": 8876219,
+        "selected_bytes": 8876219,
+        "physical_nonempty_rows": 170028,
+        "selected_nonempty_rows": 170028,
+        "selected_row_field_counts": {
+          "8": 170028
+        },
+        "pair_status_groups": {
+          "txt_only": 22
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 6,
+        "physical_files": 22,
+        "selected_files": 22,
+        "physical_bytes": 10167004,
+        "selected_bytes": 10167004,
+        "physical_nonempty_rows": 193609,
+        "selected_nonempty_rows": 193609,
+        "selected_row_field_counts": {
+          "8": 193609
+        },
+        "pair_status_groups": {
+          "txt_only": 22
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 7,
+        "physical_files": 38,
+        "selected_files": 38,
+        "physical_bytes": 12559501,
+        "selected_bytes": 12559501,
+        "physical_nonempty_rows": 240943,
+        "selected_nonempty_rows": 240943,
+        "selected_row_field_counts": {
+          "8": 240943
+        },
+        "pair_status_groups": {
+          "txt_only": 38
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 8,
+        "physical_files": 26,
+        "selected_files": 26,
+        "physical_bytes": 11636836,
+        "selected_bytes": 11636836,
+        "physical_nonempty_rows": 219498,
+        "selected_nonempty_rows": 219498,
+        "selected_row_field_counts": {
+          "8": 219498
+        },
+        "pair_status_groups": {
+          "txt_only": 26
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 9,
+        "physical_files": 28,
+        "selected_files": 28,
+        "physical_bytes": 11797232,
+        "selected_bytes": 11797232,
+        "physical_nonempty_rows": 222153,
+        "selected_nonempty_rows": 222153,
+        "selected_row_field_counts": {
+          "8": 222153
+        },
+        "pair_status_groups": {
+          "txt_only": 28
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 10,
+        "physical_files": 42,
+        "selected_files": 42,
+        "physical_bytes": 14183162,
+        "selected_bytes": 14183162,
+        "physical_nonempty_rows": 269891,
+        "selected_nonempty_rows": 269891,
+        "selected_row_field_counts": {
+          "8": 269891
+        },
+        "pair_status_groups": {
+          "txt_only": 42
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 11,
+        "physical_files": 30,
+        "selected_files": 30,
+        "physical_bytes": 13262163,
+        "selected_bytes": 13262163,
+        "physical_nonempty_rows": 247747,
+        "selected_nonempty_rows": 247747,
+        "selected_row_field_counts": {
+          "8": 247747
+        },
+        "pair_status_groups": {
+          "txt_only": 30
+        }
+      },
+      {
+        "archive_year": 2017,
+        "archive_month": 12,
+        "physical_files": 26,
+        "selected_files": 26,
+        "physical_bytes": 11374439,
+        "selected_bytes": 11374439,
+        "physical_nonempty_rows": 210662,
+        "selected_nonempty_rows": 210662,
+        "selected_row_field_counts": {
+          "8": 210662
+        },
+        "pair_status_groups": {
+          "txt_only": 26
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 2,
+        "physical_files": 50,
+        "selected_files": 50,
+        "physical_bytes": 17359578,
+        "selected_bytes": 17359578,
+        "physical_nonempty_rows": 324258,
+        "selected_nonempty_rows": 324258,
+        "selected_row_field_counts": {
+          "8": 324258
+        },
+        "pair_status_groups": {
+          "txt_only": 50
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 3,
+        "physical_files": 58,
+        "selected_files": 58,
+        "physical_bytes": 57773138,
+        "selected_bytes": 57773138,
+        "physical_nonempty_rows": 1029378,
+        "selected_nonempty_rows": 1029378,
+        "selected_row_field_counts": {
+          "8": 1029378
+        },
+        "pair_status_groups": {
+          "txt_only": 58
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 4,
+        "physical_files": 40,
+        "selected_files": 40,
+        "physical_bytes": 15096213,
+        "selected_bytes": 15096213,
+        "physical_nonempty_rows": 284148,
+        "selected_nonempty_rows": 284148,
+        "selected_row_field_counts": {
+          "8": 284148
+        },
+        "pair_status_groups": {
+          "txt_only": 40
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 5,
+        "physical_files": 39,
+        "selected_files": 39,
+        "physical_bytes": 16283270,
+        "selected_bytes": 16283270,
+        "physical_nonempty_rows": 305296,
+        "selected_nonempty_rows": 305296,
+        "selected_row_field_counts": {
+          "8": 305296
+        },
+        "pair_status_groups": {
+          "txt_only": 39
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 6,
+        "physical_files": 43,
+        "selected_files": 43,
+        "physical_bytes": 16091232,
+        "selected_bytes": 16091232,
+        "physical_nonempty_rows": 303069,
+        "selected_nonempty_rows": 303069,
+        "selected_row_field_counts": {
+          "8": 303069
+        },
+        "pair_status_groups": {
+          "txt_only": 43
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 7,
+        "physical_files": 60,
+        "selected_files": 30,
+        "physical_bytes": 24572388,
+        "selected_bytes": 12286194,
+        "physical_nonempty_rows": 459006,
+        "selected_nonempty_rows": 229503,
+        "selected_row_field_counts": {
+          "8": 229503
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 30
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 8,
+        "physical_files": 82,
+        "selected_files": 41,
+        "physical_bytes": 30147444,
+        "selected_bytes": 15073722,
+        "physical_nonempty_rows": 566684,
+        "selected_nonempty_rows": 283342,
+        "selected_row_field_counts": {
+          "8": 283342
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 41
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 9,
+        "physical_files": 92,
+        "selected_files": 46,
+        "physical_bytes": 31204020,
+        "selected_bytes": 15602010,
+        "physical_nonempty_rows": 583590,
+        "selected_nonempty_rows": 291795,
+        "selected_row_field_counts": {
+          "8": 291795
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 46
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 10,
+        "physical_files": 132,
+        "selected_files": 66,
+        "physical_bytes": 38907570,
+        "selected_bytes": 19453785,
+        "physical_nonempty_rows": 728652,
+        "selected_nonempty_rows": 364326,
+        "selected_row_field_counts": {
+          "8": 364326
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 66
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 11,
+        "physical_files": 84,
+        "selected_files": 42,
+        "physical_bytes": 33361926,
+        "selected_bytes": 16680963,
+        "physical_nonempty_rows": 620764,
+        "selected_nonempty_rows": 310382,
+        "selected_row_field_counts": {
+          "8": 310382
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 42
+        }
+      },
+      {
+        "archive_year": 2018,
+        "archive_month": 12,
+        "physical_files": 100,
+        "selected_files": 50,
+        "physical_bytes": 34552532,
+        "selected_bytes": 17276266,
+        "physical_nonempty_rows": 645088,
+        "selected_nonempty_rows": 322544,
+        "selected_row_field_counts": {
+          "8": 322544
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 50
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 1,
+        "physical_files": 100,
+        "selected_files": 50,
+        "physical_bytes": 36612464,
+        "selected_bytes": 18306232,
+        "physical_nonempty_rows": 684216,
+        "selected_nonempty_rows": 342108,
+        "selected_row_field_counts": {
+          "8": 342108
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 50
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 2,
+        "physical_files": 84,
+        "selected_files": 42,
+        "physical_bytes": 30569722,
+        "selected_bytes": 15284861,
+        "physical_nonempty_rows": 570312,
+        "selected_nonempty_rows": 285156,
+        "selected_row_field_counts": {
+          "8": 285156
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 42
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 3,
+        "physical_files": 132,
+        "selected_files": 66,
+        "physical_bytes": 35290510,
+        "selected_bytes": 17645255,
+        "physical_nonempty_rows": 666814,
+        "selected_nonempty_rows": 333407,
+        "selected_row_field_counts": {
+          "8": 333407
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 66
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 4,
+        "physical_files": 84,
+        "selected_files": 42,
+        "physical_bytes": 27386980,
+        "selected_bytes": 13693490,
+        "physical_nonempty_rows": 512780,
+        "selected_nonempty_rows": 256390,
+        "selected_row_field_counts": {
+          "8": 256390
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 42
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 5,
+        "physical_files": 92,
+        "selected_files": 46,
+        "physical_bytes": 30835014,
+        "selected_bytes": 15417507,
+        "physical_nonempty_rows": 530640,
+        "selected_nonempty_rows": 265320,
+        "selected_row_field_counts": {
+          "8": 265320
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 46
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 6,
+        "physical_files": 98,
+        "selected_files": 49,
+        "physical_bytes": 33643988,
+        "selected_bytes": 16821994,
+        "physical_nonempty_rows": 587092,
+        "selected_nonempty_rows": 293546,
+        "selected_row_field_counts": {
+          "8": 293546
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 49
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 7,
+        "physical_files": 100,
+        "selected_files": 50,
+        "physical_bytes": 35190580,
+        "selected_bytes": 17595290,
+        "physical_nonempty_rows": 617004,
+        "selected_nonempty_rows": 308502,
+        "selected_row_field_counts": {
+          "8": 308502
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 50
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 8,
+        "physical_files": 136,
+        "selected_files": 68,
+        "physical_bytes": 46873302,
+        "selected_bytes": 23436651,
+        "physical_nonempty_rows": 822206,
+        "selected_nonempty_rows": 411103,
+        "selected_row_field_counts": {
+          "8": 411103
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 68
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 9,
+        "physical_files": 124,
+        "selected_files": 62,
+        "physical_bytes": 42360434,
+        "selected_bytes": 21180217,
+        "physical_nonempty_rows": 743504,
+        "selected_nonempty_rows": 371752,
+        "selected_row_field_counts": {
+          "8": 371752
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 62
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 10,
+        "physical_files": 130,
+        "selected_files": 65,
+        "physical_bytes": 43801754,
+        "selected_bytes": 21900877,
+        "physical_nonempty_rows": 765494,
+        "selected_nonempty_rows": 382747,
+        "selected_row_field_counts": {
+          "8": 382747
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 65
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 11,
+        "physical_files": 138,
+        "selected_files": 69,
+        "physical_bytes": 39373350,
+        "selected_bytes": 19686675,
+        "physical_nonempty_rows": 693906,
+        "selected_nonempty_rows": 346953,
+        "selected_row_field_counts": {
+          "8": 346953
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 69
+        }
+      },
+      {
+        "archive_year": 2019,
+        "archive_month": 12,
+        "physical_files": 108,
+        "selected_files": 54,
+        "physical_bytes": 37649898,
+        "selected_bytes": 18824949,
+        "physical_nonempty_rows": 661178,
+        "selected_nonempty_rows": 330589,
+        "selected_row_field_counts": {
+          "8": 330589
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 54
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 1,
+        "physical_files": 122,
+        "selected_files": 61,
+        "physical_bytes": 47310260,
+        "selected_bytes": 23655130,
+        "physical_nonempty_rows": 833304,
+        "selected_nonempty_rows": 416652,
+        "selected_row_field_counts": {
+          "8": 416652
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 61
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 2,
+        "physical_files": 196,
+        "selected_files": 98,
+        "physical_bytes": 53453006,
+        "selected_bytes": 26726503,
+        "physical_nonempty_rows": 944966,
+        "selected_nonempty_rows": 472483,
+        "selected_row_field_counts": {
+          "8": 472483
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 98
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 3,
+        "physical_files": 552,
+        "selected_files": 276,
+        "physical_bytes": 86216876,
+        "selected_bytes": 43108438,
+        "physical_nonempty_rows": 1513466,
+        "selected_nonempty_rows": 756733,
+        "selected_row_field_counts": {
+          "8": 756733
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 276
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 4,
+        "physical_files": 418,
+        "selected_files": 209,
+        "physical_bytes": 73795102,
+        "selected_bytes": 36897551,
+        "physical_nonempty_rows": 1304784,
+        "selected_nonempty_rows": 652392,
+        "selected_row_field_counts": {
+          "8": 652392
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 209
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 5,
+        "physical_files": 316,
+        "selected_files": 158,
+        "physical_bytes": 56451096,
+        "selected_bytes": 28225548,
+        "physical_nonempty_rows": 1002512,
+        "selected_nonempty_rows": 501256,
+        "selected_row_field_counts": {
+          "8": 501256
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 158
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 6,
+        "physical_files": 78,
+        "selected_files": 39,
+        "physical_bytes": 33870032,
+        "selected_bytes": 16935016,
+        "physical_nonempty_rows": 526846,
+        "selected_nonempty_rows": 263423,
+        "selected_row_field_counts": {
+          "8": 263423
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 39
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 7,
+        "physical_files": 292,
+        "selected_files": 146,
+        "physical_bytes": 84346476,
+        "selected_bytes": 42173238,
+        "physical_nonempty_rows": 1482056,
+        "selected_nonempty_rows": 741028,
+        "selected_row_field_counts": {
+          "8": 741028
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 146
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 8,
+        "physical_files": 164,
+        "selected_files": 82,
+        "physical_bytes": 57953370,
+        "selected_bytes": 28976685,
+        "physical_nonempty_rows": 1008390,
+        "selected_nonempty_rows": 504195,
+        "selected_row_field_counts": {
+          "8": 504195
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 82
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 9,
+        "physical_files": 242,
+        "selected_files": 121,
+        "physical_bytes": 72947442,
+        "selected_bytes": 36473721,
+        "physical_nonempty_rows": 1139026,
+        "selected_nonempty_rows": 569513,
+        "selected_row_field_counts": {
+          "9": 569513
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 121
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 10,
+        "physical_files": 208,
+        "selected_files": 104,
+        "physical_bytes": 84317754,
+        "selected_bytes": 42158877,
+        "physical_nonempty_rows": 1311918,
+        "selected_nonempty_rows": 655959,
+        "selected_row_field_counts": {
+          "9": 655959
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 104
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 11,
+        "physical_files": 320,
+        "selected_files": 160,
+        "physical_bytes": 86674976,
+        "selected_bytes": 43337488,
+        "physical_nonempty_rows": 1355068,
+        "selected_nonempty_rows": 677534,
+        "selected_row_field_counts": {
+          "9": 677534
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 160
+        }
+      },
+      {
+        "archive_year": 2020,
+        "archive_month": 12,
+        "physical_files": 306,
+        "selected_files": 153,
+        "physical_bytes": 93409828,
+        "selected_bytes": 46704914,
+        "physical_nonempty_rows": 1456594,
+        "selected_nonempty_rows": 728297,
+        "selected_row_field_counts": {
+          "9": 728297
+        },
+        "pair_status_groups": {
+          "csv_txt_identical": 153
+        }
+      }
+    ]
+  },
+  "versions": {
+    "pandas": "2.3.3",
+    "numpy": "1.26.4",
+    "pyarrow": "20.0.0",
+    "matplotlib": "3.11.2"
+  }
+}

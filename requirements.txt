@@ -1,0 +1,29 @@
+# Use Python 3.11. These are compatibility constraints, not a full lockfile.
+# Intel macOS support ends at torch 2.2.x; its NumPy bridge requires NumPy 1.x.
+numpy==1.26.4
+torch==2.2.2; sys_platform == "darwin" and platform_machine == "x86_64"
+torch>=2.6,<3; sys_platform != "darwin" or platform_machine != "x86_64"
+
+# Numerical pricing, Sobol / differential evolution, and market-data analysis.
+scipy>=1.13,<2
+pandas>=2.2,<3
+scikit-learn>=1.5,<2
+# Keep a NumPy 1.x-compatible Arrow release alongside Intel macOS PyTorch.
+pyarrow>=17,<21
+
+# Analysis and plots.
+matplotlib>=3.9,<4
+seaborn>=0.13,<0.14
+tqdm>=4.66,<5
+
+# Structured agent proposals and local configuration.
+pydantic>=2.9,<3
+jsonschema>=4.23,<5
+PyYAML>=6,<7
+python-dotenv>=1,<2
+
+# Notebooks and development tools.
+jupyterlab>=4.3,<5
+ipykernel>=6.29,<7
+pytest>=8.3,<9
+ruff>=0.9,<1
