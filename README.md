@@ -74,7 +74,7 @@ committed to Git.
 
 ## Nifty data EDA
 
-Open `notebooks/01_nifty_eda.ipynb` for the English walkthrough, actual results,
+Open `notebooks/01_nifty_eda.ipynb` for the walkthrough, actual results,
 charts, interpretation, and difficulties encountered. A rendered copy is saved
 as `reports/nifty_eda/eda.html`. To rebuild the full audit from the raw files:
 
