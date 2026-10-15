@@ -1,0 +1,98 @@
+{
+  "status": "passed",
+  "verified_at_utc": "2026-10-14T17:57:34.650671+00:00",
+  "manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+  "verifier_sha256": "9b7167eac51f4c9a26127849ad16c7e9ad91d1f9ea8049aff7f8372e2758b609",
+  "rows_verified": 11469619,
+  "splits": [
+    {
+      "split": "train",
+      "rows_verified": 7069922,
+      "features": 15,
+      "dtype": "float32",
+      "max_target_float32_difference": 2.3820699279752944e-07
+    },
+    {
+      "split": "valid",
+      "rows_verified": 2009818,
+      "features": 15,
+      "dtype": "float32",
+      "max_target_float32_difference": 6.382962869366793e-08
+    },
+    {
+      "split": "test",
+      "rows_verified": 2389879,
+      "features": 15,
+      "dtype": "float32",
+      "max_target_float32_difference": 4.609556136792037e-08
+    }
+  ],
+  "feature_order": [
+    "log_close",
+    "log_strike",
+    "log_volume",
+    "log_high_low",
+    "log_close_open",
+    "return_1m",
+    "return_5m",
+    "return_std_5m",
+    "log_mean_volume_6bars",
+    "minute_sin",
+    "minute_cos",
+    "is_call",
+    "zero_volume",
+    "close_at_most_1",
+    "flat_ohlc"
+  ],
+  "train_standardized_mean": [
+    -9.126059829140967e-10,
+    1.6208703510998592e-09,
+    1.8139979592237619e-09,
+    -2.4553616225457725e-10,
+    -1.1798152191473864e-10,
+    3.3719974821390965e-10,
+    2.1774531695513608e-10,
+    -3.6022643442476097e-10,
+    -1.3360580708504251e-09
+  ],
+  "train_standardized_variance": [
+    1.0000000084756588,
+    1.0000000044109596,
+    0.9999999919855509,
+    0.9999999976178292,
+    0.9999999996248763,
+    0.9999999980452077,
+    1.0000000015536312,
+    0.9999999984456783,
+    1.0000000078648978
+  ],
+  "expected_standardized_variance": [
+    1.0,
+    1.0,
+    0.9999999999999999,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "scaler_training_rows": 7069922,
+  "output_files": 153,
+  "output_hashes_verified": 153,
+  "all_output_hashes_verified": true,
+  "checks": [
+    "completion manifest",
+    "feature specification",
+    "float32 tensor shapes and finiteness",
+    "metadata alignment",
+    "exact date split membership and counts",
+    "same-day five-minute input span",
+    "one-minute label horizon",
+    "targets reconstructed from prices",
+    "training-only scaler row count",
+    "training normalization moments",
+    "output inventory and sizes"
+  ],
+  "model_training_or_prediction_evaluation": false
+}

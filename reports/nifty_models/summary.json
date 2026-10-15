@@ -1,0 +1,227 @@
+{
+  "status": "complete",
+  "finished_at_utc": "2026-10-14T18:52:46.786033+00:00",
+  "selected_model": {
+    "architecture": "compact",
+    "seed": 42,
+    "input_dim": 15,
+    "hidden": [
+      32,
+      16
+    ],
+    "dropout": 0.1,
+    "activation": "ReLU",
+    "output": "unconstrained linear scalar",
+    "parameters": 1057,
+    "checkpoint": "data/processed/nifty_models/frozen_mlp.pt",
+    "checkpoint_sha256": "29623e65552908be9c3a204652b17ed3ed48478c6bad327d9ccc3dae1555c0d6",
+    "best_epoch": 1,
+    "feature_columns": [
+      "log_close",
+      "log_strike",
+      "log_volume",
+      "log_high_low",
+      "log_close_open",
+      "return_1m",
+      "return_5m",
+      "return_std_5m",
+      "log_mean_volume_6bars",
+      "minute_sin",
+      "minute_cos",
+      "is_call",
+      "zero_volume",
+      "close_at_most_1",
+      "flat_ohlc"
+    ],
+    "target_scale": 0.07981475234487422,
+    "target_center": 0.0,
+    "preprocessing_manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+    "selection_rule": "Smallest parameter count within 0.5% of the lowest three-seed mean val_day_mae",
+    "reference_seed_predeclared": true,
+    "test_evaluated": false,
+    "llm_executed": false
+  },
+  "selected_validation_metrics": {
+    "val_mae": 0.01721186368276522,
+    "val_rmse": 0.04157463521883813,
+    "val_day_mae": 0.014929210284408316,
+    "val_price_mae": 1.717357501587807,
+    "val_price_rmse": 4.1198659518336065
+  },
+  "best_ridge": {
+    "model": "ridge_1",
+    "alpha": 1.0,
+    "parameters": 16,
+    "fit_seconds": 0.6673266638536006,
+    "val_mae": 0.017948457747302075,
+    "val_rmse": 0.04208136045362137,
+    "val_day_mae": 0.01559330243886207,
+    "val_price_mae": 1.7977661994304173,
+    "val_price_rmse": 4.33876211138516
+  },
+  "persistence_validation_metrics": {
+    "model": "persistence",
+    "alpha": null,
+    "parameters": 0,
+    "fit_seconds": 0.0,
+    "val_mae": 0.017159931976768208,
+    "val_rmse": 0.0437918682206201,
+    "val_day_mae": 0.01489857663604434,
+    "val_price_mae": 1.7066798337634201,
+    "val_price_rmse": 4.071290443532038
+  },
+  "architecture_mean_day_mae_improvement_percent": -0.21252570287675354,
+  "reference_day_mae_improvement_percent": -0.2056145973694079,
+  "protocol": {
+    "task": "Next-minute log option-price return from the existing 15 engineered features",
+    "architectures": {
+      "compact": {
+        "hidden": [
+          32,
+          16
+        ],
+        "dropout": 0.1
+      },
+      "standard": {
+        "hidden": [
+          64,
+          32
+        ],
+        "dropout": 0.1
+      },
+      "wide": {
+        "hidden": [
+          128,
+          64,
+          32
+        ],
+        "dropout": 0.1
+      }
+    },
+    "seeds": [
+      17,
+      42,
+      2026
+    ],
+    "reference_seed": 42,
+    "training_rows": "All 7,069,922 prepared training examples",
+    "validation_rows": "All 2,009,818 prepared validation examples",
+    "batch_size": 4096,
+    "max_epochs": 12,
+    "early_stopping_patience": 3,
+    "early_stopping_min_delta": 1e-06,
+    "learning_rate": 0.001,
+    "optimizer": "AdamW",
+    "weight_decay": 0.0001,
+    "loss": "SmoothL1Loss(beta=1) on y / training_target_std; no target centering or clipping",
+    "gradient_clip_norm": 1.0,
+    "lr_schedule": "ReduceLROnPlateau: factor=.5, patience=1, min_lr=1e-5 on validation day MAE",
+    "initialization": "PyTorch Linear defaults for hidden layers; zero final weights/bias for zero-return starting forecast",
+    "primary_metric": "val_day_mae: mean of the 150 daily mean absolute log-return errors",
+    "secondary_metrics": [
+      "val_mae",
+      "val_rmse",
+      "val_price_mae",
+      "val_price_rmse"
+    ],
+    "selection_rule": "Smallest parameter count within 0.5% of the lowest three-seed mean val_day_mae",
+    "ridge_alphas": [
+      0.0001,
+      0.01,
+      1.0
+    ],
+    "ridge_objective": "mean squared error + alpha * squared coefficient norm, unpenalized intercept",
+    "test_evaluated": false,
+    "llm_executed": false,
+    "created_at_utc": "2026-10-14T18:40:39.541410+00:00",
+    "train_rows": 7069922,
+    "valid_rows": 2009818,
+    "feature_columns": [
+      "log_close",
+      "log_strike",
+      "log_volume",
+      "log_high_low",
+      "log_close_open",
+      "return_1m",
+      "return_5m",
+      "return_std_5m",
+      "log_mean_volume_6bars",
+      "minute_sin",
+      "minute_cos",
+      "is_call",
+      "zero_volume",
+      "close_at_most_1",
+      "flat_ohlc"
+    ],
+    "model_source_sha256": "604ab30dc253b9a1978ef799e845a21505ad7e7ae2499e0e3d0ee87c64959fbe",
+    "runner_source_sha256": "77fea29b907600655cade20d15b9b66c467f08c9b3dd3906cfd3b5335e8a3ae7",
+    "input_hashes": {
+      "train/X.npy": "b3c12c83e09aa9cd31c1c174b736c9e5ce8e32a9354aa9b256e2647a1a9f0d2f",
+      "train/y.npy": "974370b0e1c59afad7e2f0956b1db7a774beb2f4de95e7a1507d4b8c01ff562e",
+      "train/metadata.parquet": "c5884b968c35043df33769f80dd4c849a99b220f7a01455b6a1a260812f27b1c",
+      "valid/X.npy": "bc1e75a5d0f24f065b4741db2dce8bdfc2ecbcebcdd27601afea717253b4092f",
+      "valid/y.npy": "ea95f3f66a92bf44fc9c70c7855db0325375022f9af590d435507ef01030987a",
+      "valid/metadata.parquet": "13aa522f2a6214c8e2d92ed11d22f6644670c9f084665c5edbdd5d7274eef809",
+      "feature_spec.json": "41a1983e555d8f96ea47a8d06bcbc96e29fa0f585f9d163920b6fa51e1d464fd",
+      "scaler.json": "aca710362ce897800020571e691f4c3a6c64c7da7eb14e5cfc9697af4ec45e6c"
+    },
+    "preprocessing_manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+    "feature_scaler_sha256": "aca710362ce897800020571e691f4c3a6c64c7da7eb14e5cfc9697af4ec45e6c",
+    "hardware": {
+      "system": "Darwin",
+      "machine": "x86_64",
+      "logical_cpus": 16,
+      "device": "cpu",
+      "torch_threads": 4,
+      "versions": {
+        "torch": "2.2.2",
+        "numpy": "1.26.4",
+        "pandas": "2.3.3"
+      }
+    },
+    "train_probe_rows": 65536,
+    "train_probe_seed": 9102
+  },
+  "hardware": {
+    "system": "Darwin",
+    "machine": "x86_64",
+    "logical_cpus": 16,
+    "device": "cpu",
+    "torch_threads": 4,
+    "versions": {
+      "torch": "2.2.2",
+      "numpy": "1.26.4",
+      "pandas": "2.3.3"
+    }
+  },
+  "target_scaler": {
+    "scale": 0.07981475234487422,
+    "center": 0.0,
+    "observed_train_mean": -0.0003261493284968819,
+    "fit_rows": 7069922,
+    "fit_split": "train",
+    "clipping": false
+  },
+  "selection_rule": "Smallest parameter count within 0.5% of the lowest three-seed mean val_day_mae",
+  "uncertainty": {
+    "comparison": "frozen MLP day MAE minus persistence day MAE; negative favors MLP",
+    "mean_difference": 3.0633648363977175e-05,
+    "descriptive_95pct_interval": [
+      -2.0846759929671948e-05,
+      6.991037864326846e-05
+    ],
+    "method": "2000 circular moving-block resamples of validation days; block length 5; seed 8801",
+    "caveat": "Exploratory validation comparison after architecture selection, not an unbiased test confidence interval; nonstationarity may invalidate block assumptions"
+  },
+  "validation_days": 150,
+  "checkpoint_reload_exact_match": true,
+  "test_evaluated": false,
+  "llm_executed": false,
+  "limitations": [
+    "Validation guided architecture selection, early stopping and learning-rate scheduling",
+    "Earlier EDA inspected all periods, but this modeling workflow did not open test arrays",
+    "Reported bar prices are not executable quotes; errors do not establish trading profitability",
+    "Input features summarize six bars; recurrent/convolutional/attention sequence models require a separate sequence adapter",
+    "Target scaling is fitted on training only; absolute errors are reported in original log-return or reported price units"
+  ]
+}

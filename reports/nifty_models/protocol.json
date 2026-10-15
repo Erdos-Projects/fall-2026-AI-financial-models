@@ -1,0 +1,110 @@
+{
+  "task": "Next-minute log option-price return from the existing 15 engineered features",
+  "architectures": {
+    "compact": {
+      "hidden": [
+        32,
+        16
+      ],
+      "dropout": 0.1
+    },
+    "standard": {
+      "hidden": [
+        64,
+        32
+      ],
+      "dropout": 0.1
+    },
+    "wide": {
+      "hidden": [
+        128,
+        64,
+        32
+      ],
+      "dropout": 0.1
+    }
+  },
+  "seeds": [
+    17,
+    42,
+    2026
+  ],
+  "reference_seed": 42,
+  "training_rows": "All 7,069,922 prepared training examples",
+  "validation_rows": "All 2,009,818 prepared validation examples",
+  "batch_size": 4096,
+  "max_epochs": 12,
+  "early_stopping_patience": 3,
+  "early_stopping_min_delta": 1e-06,
+  "learning_rate": 0.001,
+  "optimizer": "AdamW",
+  "weight_decay": 0.0001,
+  "loss": "SmoothL1Loss(beta=1) on y / training_target_std; no target centering or clipping",
+  "gradient_clip_norm": 1.0,
+  "lr_schedule": "ReduceLROnPlateau: factor=.5, patience=1, min_lr=1e-5 on validation day MAE",
+  "initialization": "PyTorch Linear defaults for hidden layers; zero final weights/bias for zero-return starting forecast",
+  "primary_metric": "val_day_mae: mean of the 150 daily mean absolute log-return errors",
+  "secondary_metrics": [
+    "val_mae",
+    "val_rmse",
+    "val_price_mae",
+    "val_price_rmse"
+  ],
+  "selection_rule": "Smallest parameter count within 0.5% of the lowest three-seed mean val_day_mae",
+  "ridge_alphas": [
+    0.0001,
+    0.01,
+    1.0
+  ],
+  "ridge_objective": "mean squared error + alpha * squared coefficient norm, unpenalized intercept",
+  "test_evaluated": false,
+  "llm_executed": false,
+  "created_at_utc": "2026-10-14T18:40:39.541410+00:00",
+  "train_rows": 7069922,
+  "valid_rows": 2009818,
+  "feature_columns": [
+    "log_close",
+    "log_strike",
+    "log_volume",
+    "log_high_low",
+    "log_close_open",
+    "return_1m",
+    "return_5m",
+    "return_std_5m",
+    "log_mean_volume_6bars",
+    "minute_sin",
+    "minute_cos",
+    "is_call",
+    "zero_volume",
+    "close_at_most_1",
+    "flat_ohlc"
+  ],
+  "model_source_sha256": "604ab30dc253b9a1978ef799e845a21505ad7e7ae2499e0e3d0ee87c64959fbe",
+  "runner_source_sha256": "77fea29b907600655cade20d15b9b66c467f08c9b3dd3906cfd3b5335e8a3ae7",
+  "input_hashes": {
+    "train/X.npy": "b3c12c83e09aa9cd31c1c174b736c9e5ce8e32a9354aa9b256e2647a1a9f0d2f",
+    "train/y.npy": "974370b0e1c59afad7e2f0956b1db7a774beb2f4de95e7a1507d4b8c01ff562e",
+    "train/metadata.parquet": "c5884b968c35043df33769f80dd4c849a99b220f7a01455b6a1a260812f27b1c",
+    "valid/X.npy": "bc1e75a5d0f24f065b4741db2dce8bdfc2ecbcebcdd27601afea717253b4092f",
+    "valid/y.npy": "ea95f3f66a92bf44fc9c70c7855db0325375022f9af590d435507ef01030987a",
+    "valid/metadata.parquet": "13aa522f2a6214c8e2d92ed11d22f6644670c9f084665c5edbdd5d7274eef809",
+    "feature_spec.json": "41a1983e555d8f96ea47a8d06bcbc96e29fa0f585f9d163920b6fa51e1d464fd",
+    "scaler.json": "aca710362ce897800020571e691f4c3a6c64c7da7eb14e5cfc9697af4ec45e6c"
+  },
+  "preprocessing_manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+  "feature_scaler_sha256": "aca710362ce897800020571e691f4c3a6c64c7da7eb14e5cfc9697af4ec45e6c",
+  "hardware": {
+    "system": "Darwin",
+    "machine": "x86_64",
+    "logical_cpus": 16,
+    "device": "cpu",
+    "torch_threads": 4,
+    "versions": {
+      "torch": "2.2.2",
+      "numpy": "1.26.4",
+      "pandas": "2.3.3"
+    }
+  },
+  "train_probe_rows": 65536,
+  "train_probe_seed": 9102
+}

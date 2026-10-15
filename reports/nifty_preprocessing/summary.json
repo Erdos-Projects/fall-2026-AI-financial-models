@@ -1,0 +1,73 @@
+{
+  "selected_raw_rows": 17611169,
+  "retained_clean_rows": 17576228,
+  "excluded_rows": 34941,
+  "total_examples": 11469619,
+  "feature_count": 15,
+  "history_bars": 6,
+  "target": "target_log_return = log(close[t+1] / close[t]); exactly one minute ahead",
+  "observed_dates": 1000,
+  "counts": {
+    "input_rows": 17611169,
+    "flag_invalid_timestamp": 0,
+    "excluded_invalid_timestamp": 0,
+    "flag_invalid_symbol_or_strike": 0,
+    "excluded_invalid_symbol_or_strike": 0,
+    "flag_missing_or_nonfinite_numeric": 0,
+    "excluded_missing_or_nonfinite_numeric": 0,
+    "flag_nonpositive_price": 0,
+    "excluded_nonpositive_price": 0,
+    "flag_negative_volume": 0,
+    "excluded_negative_volume": 0,
+    "flag_ohlc_inconsistent": 2952,
+    "excluded_ohlc_inconsistent": 2952,
+    "flag_conflicting_source_timestamp": 0,
+    "excluded_conflicting_source_timestamp": 0,
+    "flag_exact_duplicate_extra": 0,
+    "excluded_exact_duplicate_extra": 0,
+    "flag_outside_reference_session": 34662,
+    "excluded_outside_reference_session": 31989,
+    "flag_non_minute_timestamp": 0,
+    "excluded_non_minute_timestamp": 0,
+    "retained_rows": 17576228,
+    "excluded_rows": 34941,
+    "retained_zero_volume": 374544,
+    "retained_close_at_most_1": 490741,
+    "retained_flat_ohlc": 3345913,
+    "retained_weekend_observation": 16491
+  },
+  "splits": [
+    {
+      "split": "train",
+      "start_date": "2016-12-14",
+      "end_date": "2019-10-17",
+      "dates": 700,
+      "clean_rows": 9887527,
+      "examples": 7069922
+    },
+    {
+      "split": "valid",
+      "start_date": "2019-10-18",
+      "end_date": "2020-05-29",
+      "dates": 150,
+      "clean_rows": 3565817,
+      "examples": 2009818
+    },
+    {
+      "split": "test",
+      "start_date": "2020-06-01",
+      "end_date": "2020-12-31",
+      "dates": 150,
+      "clean_rows": 4122884,
+      "examples": 2389879
+    }
+  ],
+  "clean_rows_without_eligible_window": 6106609,
+  "status": "Ready for empirical bar forecasting under documented source semantics assumptions; not theoretical option pricing",
+  "split_method": "Chronological 70/15/15 by unique retained source dates; all files on a date share its split",
+  "test_status": "Held out from fitting/normalization/tuning; the existing EDA already examined all years",
+  "session_scope": "09:15 inclusive to 15:30 exclusive in source clock time; special sessions outside this window excluded by scope, not labeled erroneous",
+  "missing_value_policy": "Drop invalid essential fields; omit structurally missing/unverified extra field 9; no imputation or gap filling",
+  "identity_caveat": "file_id is only a source-series key; complete exchange contract identity remains unverified",
+  "outlier_policy": "Keep valid extreme/low/flat/zero-volume observations; no target-dependent filtering or winsorization"
+}

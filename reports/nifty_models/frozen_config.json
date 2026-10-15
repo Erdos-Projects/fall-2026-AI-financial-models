@@ -1,0 +1,40 @@
+{
+  "architecture": "compact",
+  "seed": 42,
+  "input_dim": 15,
+  "hidden": [
+    32,
+    16
+  ],
+  "dropout": 0.1,
+  "activation": "ReLU",
+  "output": "unconstrained linear scalar",
+  "parameters": 1057,
+  "checkpoint": "data/processed/nifty_models/frozen_mlp.pt",
+  "checkpoint_sha256": "29623e65552908be9c3a204652b17ed3ed48478c6bad327d9ccc3dae1555c0d6",
+  "best_epoch": 1,
+  "feature_columns": [
+    "log_close",
+    "log_strike",
+    "log_volume",
+    "log_high_low",
+    "log_close_open",
+    "return_1m",
+    "return_5m",
+    "return_std_5m",
+    "log_mean_volume_6bars",
+    "minute_sin",
+    "minute_cos",
+    "is_call",
+    "zero_volume",
+    "close_at_most_1",
+    "flat_ohlc"
+  ],
+  "target_scale": 0.07981475234487422,
+  "target_center": 0.0,
+  "preprocessing_manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+  "selection_rule": "Smallest parameter count within 0.5% of the lowest three-seed mean val_day_mae",
+  "reference_seed_predeclared": true,
+  "test_evaluated": false,
+  "llm_executed": false
+}

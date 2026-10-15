@@ -1,0 +1,7 @@
+split,option_type,examples,zero_volume,close_at_most_1
+test,CE,1084343,0,25373
+test,PE,1305536,0,29389
+train,CE,3431731,205736,106793
+train,PE,3638191,164467,60167
+valid,CE,979825,1,22336
+valid,PE,1029993,1,23716
