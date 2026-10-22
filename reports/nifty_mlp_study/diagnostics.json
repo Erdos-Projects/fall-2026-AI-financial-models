@@ -1,0 +1,26 @@
+{
+  "method": "2,000 circular moving-block resamples of 150 validation dates; block length 5; seed 8801",
+  "caveat": "Descriptive post-selection validation intervals; not independent test confidence intervals",
+  "models": {
+    "compact": {
+      "seed": 42,
+      "mean_day_mae_difference": 3.063364836397992e-05,
+      "descriptive_95pct_interval": [
+        -2.0846759929664687e-05,
+        6.99103786432667e-05
+      ],
+      "days_better_than_persistence": 41,
+      "days": 150
+    },
+    "wide": {
+      "seed": 42,
+      "mean_day_mae_difference": 8.53952839248195e-06,
+      "descriptive_95pct_interval": [
+        -3.8907025776550875e-05,
+        4.383101579338585e-05
+      ],
+      "days_better_than_persistence": 47,
+      "days": 150
+    }
+  }
+}

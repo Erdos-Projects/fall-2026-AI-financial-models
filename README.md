@@ -7,6 +7,10 @@ contains environment configuration, local Nifty data, EDA, preprocessing, and
 reproducible neural forecasting baselines; the earlier
 synthetic benchmark described in the project handoff is not included here.
 
+Latest check-in: [baseline performance](reports/nifty_baseline_performance/report.md)
+and [short answers](reports/nifty_baseline_performance/check_in.md).
+Previous check-in: [MLP architecture comparison](reports/nifty_mlp_study/report.md).
+
 ## Setup
 
 Run these commands from the repository root with Conda installed:
@@ -249,3 +253,90 @@ in the same notebook but **has not started**. Its proposed tests use verified
 historical labels first, deterministic execution, and equal-budget fixed-rule
 and random comparators. LLM prompts must not consume final test data; generated
 market paths cannot be assigned invented ground-truth prices.
+
+<!-- MLP_STUDY_START -->
+## Expanded MLP comparison — October 22, 2026
+
+Read the [full report](reports/nifty_mlp_study/report.md),
+[rendered HTML](reports/nifty_mlp_study/report.html),
+[research references](reports/nifty_mlp_study/literature.md), and
+[short weekly check-in](reports/nifty_mlp_study/check_in.md).
+
+The completed extension compares **eight common MLP architectures × three seeds**
+on the full 7,069,922 training examples and 2,009,818 chronological validation
+examples. It adds 15 new fits and reuses the nine verified October 14 fits with
+explicit provenance. All models use the same 15 features, target scaling,
+Smooth L1 loss, AdamW, batch size, early-stopping rules, and seed set.
+The reserved test data were not evaluated.
+
+| MLP | Structure | Parameters | Mean date MAE | Mean return RMSE |
+| --- | --- | --- | --- | --- |
+| Compact | 15 → 32 → 16 → 1 | 1,057 | 0.0149302 | 0.0412959 |
+| Standard + dropout | 15 → 64 → 32 → 1 | 3,137 | 0.0149213 | 0.0412289 |
+| Wide / tapered | 15 → 128 → 64 → 32 → 1 | 12,417 | 0.0149090 | 0.0409861 |
+| Shallow | 15 → 64 → 1 | 1,089 | 0.0151381 | 0.0414740 |
+| Standard, no dropout | 15 → 64 → 32 → 1 | 3,137 | 0.0149675 | 0.0412411 |
+| Deep | 15 → 64 → 64 → 64 → 64 → 1 | 13,569 | 0.0149135 | 0.0410146 |
+| BatchNorm | 15 → 64 → 32 → 1 + BatchNorm | 3,329 | 0.0149248 | 0.0411026 |
+| Residual + LayerNorm | 15 → 64; 2 × residual blocks at width 64; → 1 | 17,985 | 0.0149363 | 0.0413424 |
+
+Persistence date-MAE is **0.0148986**. The lowest MLP mean
+belongs to **Wide / tapered**; the predeclared smallest-model-within-0.5% rule
+selects **Compact**. Means across seeds describe architecture performance;
+seed 42 remains the reference checkpoint. A lower return RMSE alone does not
+establish better price accuracy or trading performance.
+
+The report includes seed variability, price errors, measured training times,
+fresh CPU inference benchmarks for all eight models, learning curves,
+date/price/volume diagnostics, and a sourced discussion of LSTM, TCN, and
+FT-Transformer alternatives. Those alternatives have not been trained here.
+Plain MLP and residual families are motivated by
+[Gorishniy et al. (2021)](https://arxiv.org/html/2106.11959v5); exact widths are
+project choices. Prior training times come from the earlier session; all
+inference timings are newly measured together.
+
+```bash
+# Fresh study only; protects existing outputs.
+.conda/bin/python scripts/train_nifty_mlp_study.py
+# Resume unfinished runs after an interruption.
+.conda/bin/python scripts/resume_nifty_mlp_study.py
+# Verify saved results and regenerate report/README without retraining.
+.conda/bin/python scripts/verify_nifty_mlp_study.py
+.conda/bin/python scripts/build_nifty_mlp_report.py
+.conda/bin/python -m pytest -q
+```
+
+New checkpoints and prediction arrays are local under
+`data/processed/nifty_mlp_study/`; reused checkpoints remain in
+`data/processed/nifty_models/`. The prior frozen model and notebook are preserved.
+The [verification record](reports/nifty_mlp_study/verification.json) records
+independent full-validation checkpoint and metric checks.
+<!-- MLP_STUDY_END -->
+
+<!-- BASELINE_PERFORMANCE_START -->
+## Baseline performance check-in
+
+The [performance report](reports/nifty_baseline_performance/report.md)
+([HTML](reports/nifty_baseline_performance/report.html)) and
+[short check-in answers](reports/nifty_baseline_performance/check_in.md)
+address the next assignment's three questions using the **frozen compact MLP,
+seed 42**. Training and evaluation were already complete; this follow-up adds
+focused learning, daily-error, and subgroup figures without retraining.
+
+On 2,009,818 validation examples, pooled return MAE/RMSE are
+**0.01721/0.04157**, equal-date MAE is
+**0.0149292**, and price MAE/RMSE are
+**1.717/4.120**. Return RMSE improves
+**5.06%** over persistence, concentrated in low-price options;
+absolute and price errors remain slightly worse. These are fixed-checkpoint
+validation results, not the three-seed averages in the architecture table.
+Only two validation rows have zero volume, precluding a reliable subgroup claim.
+The final test set remains reserved.
+
+```bash
+.conda/bin/python scripts/build_nifty_baseline_performance.py
+```
+
+The builder checks the saved evidence hashes and reconstructs the headline
+metrics from daily diagnostics. See its [audit summary](reports/nifty_baseline_performance/summary.json).
+<!-- BASELINE_PERFORMANCE_END -->

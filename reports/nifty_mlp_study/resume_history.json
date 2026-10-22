@@ -1,0 +1,115 @@
+{
+  "sessions": [
+    {
+      "started_at_utc": "2026-10-22T16:27:34.364242+00:00",
+      "status": "complete",
+      "resume_source_sha256": "c8f2087cff423b2e342b422d1336a092dc0a28c36dcfdcdc797eb1701d6140c2",
+      "protocol_sha256": "62a16063dc8356f506d3bd98bb0bfc5e0e9972cb2d3a5d95c88d4a51af2d1976",
+      "completed_at_start": [
+        [
+          "compact",
+          17
+        ],
+        [
+          "compact",
+          42
+        ],
+        [
+          "compact",
+          2026
+        ],
+        [
+          "shallow",
+          17
+        ],
+        [
+          "shallow",
+          42
+        ],
+        [
+          "shallow",
+          2026
+        ],
+        [
+          "standard",
+          17
+        ],
+        [
+          "standard",
+          42
+        ],
+        [
+          "standard",
+          2026
+        ],
+        [
+          "wide",
+          17
+        ],
+        [
+          "wide",
+          42
+        ],
+        [
+          "wide",
+          2026
+        ]
+      ],
+      "missing_at_start": [
+        [
+          "standard_plain",
+          17
+        ],
+        [
+          "standard_plain",
+          42
+        ],
+        [
+          "standard_plain",
+          2026
+        ],
+        [
+          "deep",
+          17
+        ],
+        [
+          "deep",
+          42
+        ],
+        [
+          "deep",
+          2026
+        ],
+        [
+          "batchnorm",
+          17
+        ],
+        [
+          "batchnorm",
+          42
+        ],
+        [
+          "batchnorm",
+          2026
+        ],
+        [
+          "residual",
+          17
+        ],
+        [
+          "residual",
+          42
+        ],
+        [
+          "residual",
+          2026
+        ]
+      ],
+      "runs_sha256_at_start": "741ad5e4c3a697cb93ea737753864fb93af14a8c696d917b419d7393e78abe59",
+      "history_sha256_at_start": "49e1c9c67bc4df865bbb6c3453f53031ea9d7e7049245e3c928f3f9ccf64cb08",
+      "restart_policy": "Incomplete seeds restart with their original seed and unchanged fit_one",
+      "finished_at_utc": "2026-10-22T16:44:02.860192+00:00",
+      "total_completed_runs": 24
+    }
+  ]
+}

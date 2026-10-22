@@ -1,0 +1,49 @@
+{
+  "status": "complete",
+  "baseline": "compact",
+  "seed": 42,
+  "new_fits": 0,
+  "test_evaluated": false,
+  "validation_rows": 2009818,
+  "validation_dates": 150,
+  "metrics": {
+    "val_day_mae": 0.0149292102844083,
+    "val_mae": 0.0172118636827652,
+    "val_rmse": 0.0415746352188381,
+    "val_price_mae": 1.717357501587807,
+    "val_price_rmse": 4.119865951833607
+  },
+  "persistence_metrics": {
+    "val_mae": 0.017159931976768208,
+    "val_rmse": 0.0437918682206201,
+    "val_day_mae": 0.01489857663604434,
+    "val_price_mae": 1.7066798337634201,
+    "val_price_rmse": 4.071290443532038
+  },
+  "relative_error_change_percent": {
+    "val_day_mae": 0.20561459736929688,
+    "val_mae": 0.30263351898653923,
+    "val_rmse": -5.063115806367868,
+    "val_price_mae": 0.6256397722144147,
+    "val_price_rmse": 1.193123138113128
+  },
+  "daily_mae_sd": 0.010549991926140978,
+  "days_better_than_persistence": 41,
+  "zero_volume_rows": 2,
+  "all_input_hashes_matched": true,
+  "headline_metrics_reconstructed_from_daily": true,
+  "input_hashes": {
+    "reports/nifty_mlp_study/summary.json": "8b377bc88911f55840d8dda9df72e0df816d3656a18d59cff817614935f0eade",
+    "reports/nifty_mlp_study/protocol.json": "62a16063dc8356f506d3bd98bb0bfc5e0e9972cb2d3a5d95c88d4a51af2d1976",
+    "reports/nifty_mlp_study/runs.csv": "9f0e87a1bcb70ca7d91dd9e94a0f28d27994c6333ae4f79940409d4013c11c1f",
+    "reports/nifty_mlp_study/architecture_comparison.csv": "2758fabb409022fbb8d165a0323a5d030a5c27cb412a59ded136ea696c26cec2",
+    "reports/nifty_mlp_study/history.csv": "cd825eff393d553769351ce15c1455db7289b41d05c8f740aa0144a052fd36ed",
+    "reports/nifty_mlp_study/subgroups.csv": "0ac7394d7a4321770c083cbe5033ed9d022fc8f28ae5ab3ec62a461a53496fad",
+    "reports/nifty_mlp_study/daily_validation.csv": "9742f8d38fc5fe318ee0159f3df90a614c914960bb3bdd646ff55b536704ddd2",
+    "reports/nifty_mlp_study/inference.csv": "176a347cb10e03710876163dea9b11879cc833446c22c46c3f0fdf36c6cbb70e"
+  },
+  "prior_verification_sha256": "0e36bf4cff137c3927155f35ff867a26fc55dba160a1cfe5b43bafba9be779f7",
+  "frozen_checkpoint_sha256": "29623e65552908be9c3a204652b17ed3ed48478c6bad327d9ccc3dae1555c0d6",
+  "builder_source_sha256": "9304bd6df30c41aa0054a8926cefbffac35cfd798419c1bcebec90df05fa7a62",
+  "plot_source_sha256": "7a161768a0c94d30354419c79a92e61ec8dbba1464f7b1c2ac28b3e5795c47c4"
+}

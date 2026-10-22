@@ -1,0 +1,7 @@
+comparison,seed,from_model,to_model,day_mae_difference
+Add dropout 0.1,17,standard_plain,standard,-3.4717336706201196e-05
+Add dropout 0.1,42,standard_plain,standard,-7.817300633630037e-05
+Add dropout 0.1,2026,standard_plain,standard,-2.5871542195200423e-05
+Add BatchNorm,17,standard,batchnorm,6.507981391800505e-06
+Add BatchNorm,42,standard,batchnorm,2.4081534567699583e-05
+Add BatchNorm,2026,standard,batchnorm,-1.9924764590799685e-05

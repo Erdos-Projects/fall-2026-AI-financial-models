@@ -1,0 +1,3 @@
+# Weekly check-in — October 22, 2026
+
+Based on last week's exploration, we used 15 cleaned features to predict next-minute Nifty option log returns. We compared eight MLP architectures—including shallow, deeper, dropout, BatchNorm, and residual networks—across three seeds, with persistence and ridge as reference baselines. The wide MLP achieved the lowest neural validation date-MAE (0.0149090), while our size-versus-accuracy rule selected the compact MLP (1,057 parameters; approximately 49 µs warm CPU inference per example). The best MLP's mean date-MAE was 0.07% higher than persistence. We will retain this small neural benchmark and investigate sequence models next; these are validation findings, with final test evaluation still reserved.

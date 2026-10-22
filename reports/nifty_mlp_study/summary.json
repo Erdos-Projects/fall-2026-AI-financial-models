@@ -1,0 +1,37 @@
+{
+  "status": "complete",
+  "finished_at_utc": "2026-10-22T16:44:02.850409+00:00",
+  "protocol_sha256": "62a16063dc8356f506d3bd98bb0bfc5e0e9972cb2d3a5d95c88d4a51af2d1976",
+  "selected_architecture": "compact",
+  "best_mean_architecture": "wide",
+  "selected_reference_metrics": {
+    "val_day_mae": 0.0149292102844083,
+    "val_mae": 0.0172118636827652,
+    "val_rmse": 0.0415746352188381,
+    "val_price_mae": 1.717357501587807,
+    "val_price_rmse": 4.119865951833607
+  },
+  "selected_checkpoint": "data/processed/nifty_models/compact_seed42.pt",
+  "reference_seed": 42,
+  "persistence_metrics": {
+    "val_mae": 0.017159931976768208,
+    "val_rmse": 0.0437918682206201,
+    "val_day_mae": 0.01489857663604434,
+    "val_price_mae": 1.7066798337634201,
+    "val_price_rmse": 4.071290443532038
+  },
+  "target_scale": 0.07981475234487422,
+  "architectures": 8,
+  "total_runs": 24,
+  "new_runs": 15,
+  "reused_runs": 9,
+  "test_evaluated": false,
+  "llm_executed": false,
+  "limitations": [
+    "Same validation period reused for architecture selection; no untouched test claim",
+    "Earlier EDA inspected all dates; model development opens train/valid only",
+    "Original training times come from a prior session; fresh inference timings cover every model",
+    "Three seed standard deviations describe optimization variability, not market uncertainty",
+    "Models use engineered summaries, not raw sequences or theoretical pricing inputs"
+  ]
+}
