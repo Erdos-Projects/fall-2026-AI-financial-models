@@ -214,7 +214,7 @@ def trials_figure(searches: list[dict], base: float, persistence: float, path: P
         plt.close(fig)
 
 
-def confirmation_figure(confirmation: dict, path: Path) -> None:
+def confirmation_figure(confirmation: dict, path: Path, title: str, period: str) -> None:
     rows = confirmation["selections"][::-1]
     base = confirmation["baseline_config_day_mae_mean"]
     persistence = pct(confirmation["persistence"]["day_mae"], base)
@@ -243,14 +243,28 @@ def confirmation_figure(confirmation: dict, path: Path) -> None:
                                          for row in rows])
         ax.grid(axis="y", visible=False)
         ax.tick_params(axis="y", labelcolor=INK_2)
-        ax.set_xlabel("validation equal-date MAE change vs baseline config (%), mean of 3 seeds; lower is better")
-        ax.set_title("Confirmation on the 150 original validation dates", loc="left", color=INK)
+        ax.set_xlabel(f"{period} equal-date MAE change vs baseline config (%), mean of 3 seeds; lower is better")
+        ax.set_title(title, loc="left", color=INK)
         fig.legend(handles=[
             Line2D([], [], marker="o", linestyle="-", color=COLORS["random"], label="seed mean, paired 95% interval"),
             Line2D([], [], marker="o", linestyle="", markerfacecolor="none", markeredgecolor=MUTED,
                    label="individual seeds")], loc="outside lower center", ncols=2, fontsize=9)
         fig.savefig(path, dpi=150, bbox_inches="tight", pad_inches=0.3)
         plt.close(fig)
+
+
+def selection_rows(results: dict) -> list[list]:
+    rows = []
+    for row in results["selections"]:
+        low, high = row["paired_daily_difference_95pct_of_baseline"]
+        rows.append([LABELS[row["arm"]] + (f" r{row['repeat']}" if row["repeat"] > 1 else ""),
+                     row["trial"] or "-", f"{row['day_mae_mean']:.7f}",
+                     fmt(row["day_mae_vs_baseline_config_pct"]) + (
+                         "" if row["arm"] == "baseline" else f" [{low:+.3f}, {high:+.3f}]"),
+                     fmt(row["day_mae_vs_persistence_pct"]), fmt(row["rmse_vs_persistence_pct"], "+.2f"),
+                     fmt(row["price_mae_vs_persistence_pct"], "+.2f"),
+                     f"{row['dates_better_than_persistence']}/{row['dates']}"])
+    return rows
 
 
 def main(report: Path = REPORT) -> None:
@@ -275,14 +289,22 @@ def main(report: Path = REPORT) -> None:
     confirmation_path = report / "confirmation/results.json"
     confirmation = json.loads(confirmation_path.read_text()) if confirmation_path.exists() else None
     if confirmation:
-        confirmation_figure(confirmation, figures / "confirmation.png")
+        confirmation_figure(confirmation, figures / "confirmation.png",
+                            "Confirmation on the 150 original validation dates", "validation")
+    test_path = report / "final_test/results.json"
+    final_test = json.loads(test_path.read_text()) if test_path.exists() else None
+    if final_test:
+        confirmation_figure(final_test, figures / "final_test.png",
+                            "Final test on the 150 reserved dates, June-December 2020", "test")
 
     complete = [s for s in searches if s["complete"]]
     pending = [s for s in searches if not s["complete"]]
     lines = ["# LLM-guided improvement search for the compact Nifty MLP", "",
              (f"Built {datetime.now().date().isoformat()} from saved files; this builder trains nothing. "
              f"Study protocol written {protocol['created_at_utc'][:10]} before any search training. "
-             "**The reserved June–December 2020 test dates have not been evaluated.**"), ""]
+             + ("The frozen selections were evaluated once on the reserved June–December 2020 test dates "
+                f"({final_test['finished_at_utc'][:10]})." if final_test else
+                "**The reserved June–December 2020 test dates have not been evaluated.**")), ""]
     status = ", ".join(f"{s['label']} {s['done']}/{s['budget']}" for s in searches) or "no search has started"
     lines += [f"**Status:** {status}. Confirmation: {'complete' if confirmation else 'not yet run'}.", ""]
     lines += ["## Question and design", "",
@@ -341,31 +363,35 @@ def main(report: Path = REPORT) -> None:
                   ("Tokens are estimated as characters / 4. Relay time runs from prompt creation to reply submission "
                   "and includes the person relaying the text, so it is not model latency. *Direction right* is the "
                   "share of evaluated proposals whose predicted and measured changes had the same sign."), ""]
+    headers = ["Selection", "Trial", "Equal-date MAE (3-seed mean)", "vs baseline config [paired 95%]",
+               "vs persistence", "RMSE vs persistence", "Price MAE vs persistence", "Dates better than persistence"]
     if confirmation:
-        rows = []
-        for row in confirmation["selections"]:
-            low, high = row["paired_daily_difference_95pct_of_baseline"]
-            rows.append([LABELS[row["arm"]] + (f" r{row['repeat']}" if row["repeat"] > 1 else ""),
-                         row["trial"] or "-", f"{row['day_mae_mean']:.7f}",
-                         fmt(row["day_mae_vs_baseline_config_pct"]) + (
-                             "" if row["arm"] == "baseline" else f" [{low:+.3f}, {high:+.3f}]"),
-                         fmt(row["day_mae_vs_persistence_pct"]), fmt(row["rmse_vs_persistence_pct"], "+.2f"),
-                         fmt(row["price_mae_vs_persistence_pct"], "+.2f"),
-                         f"{row['dates_better_than_persistence']}/{row['dates']}"])
+        rows = selection_rows(confirmation)
         window = protocol["confirmation"]["window"]
         lines += ["## Confirmation on the original validation dates", "",
                   ("Each search's selected configuration and the baseline configuration were refit with seeds "
                    f"{', '.join(map(str, protocol['confirmation']['seeds']))}: fit on {window['fit']}; "
                    f"tuned on {window['tune']}; scored on {window['score']}."), "",
-                  table(["Selection", "Trial", "Equal-date MAE (3-seed mean)", "vs baseline config [paired 95%]",
-                         "vs persistence", "RMSE vs persistence", "Price MAE vs persistence",
-                         "Dates better than persistence"], rows), "",
+                  table(headers, rows), "",
                   (f"Persistence equal-date MAE: {confirmation['persistence']['day_mae']:.7f}. The unchanged frozen "
                   f"checkpoint scores {confirmation['frozen_checkpoint']['day_mae']:.7f} but was early-stopped on "
                   "these dates, so it is a reference rather than a fair comparator. Intervals come from a circular "
                   "block bootstrap over dates (block 5) of seed-averaged daily differences; they describe "
                   "variation across these dates, not uncertainty over future markets."), "",
                   "![Confirmation](figures/confirmation.png)", ""]
+    if final_test:
+        lines += ["## Final test on the reserved June–December 2020 dates", "",
+                  ("After confirmation, the six frozen selections were refit once more with the same three seeds "
+                   "under the predeclared test plan: fit on training dates 0–809 (through the first 110 validation "
+                   "dates), tune on dates 810–849, and score once on the 150 reserved test dates. No search, "
+                   "selection or prompt used these dates."), "",
+                  table(headers, selection_rows(final_test)), "",
+                  (f"Persistence equal-date MAE: {final_test['persistence']['day_mae']:.7f}. The unchanged frozen "
+                   f"checkpoint scores {final_test['frozen_checkpoint']['day_mae']:.7f}; it never saw these dates, "
+                   "but it was trained only on dates before October 2019, whereas the refit selections also learned "
+                   "from most validation dates. The baseline configuration refit under the identical plan is the "
+                   "like-for-like comparator."), "",
+                  "![Final test](figures/final_test.png)", ""]
     lines += ["## Caveats", "", *[f"- {caveat}" for caveat in protocol["caveats"]]]
     if pending:
         lines.append("- Searches still in progress: " + ", ".join(s["label"] for s in pending)

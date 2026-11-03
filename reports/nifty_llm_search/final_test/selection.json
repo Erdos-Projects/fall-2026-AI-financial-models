@@ -1,0 +1,114 @@
+{
+ "plan": "test",
+ "seeds": [
+  17,
+  42,
+  2026
+ ],
+ "selected_at_utc": "2026-11-03T03:34:12.447830+00:00",
+ "selections": [
+  {
+   "arm": "baseline",
+   "repeat": 0,
+   "trial": 0,
+   "config": {
+    "loss": "smooth_l1",
+    "smooth_l1_beta": 1.0,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "dropout": 0.1,
+    "sample_weighting": "none",
+    "low_price_weight": 1.0,
+    "calibration": "none"
+   },
+   "config_hash": "a5a698040308072e",
+   "search_objective": 0.014448371477324216
+  },
+  {
+   "arm": "gpt_hypotheses",
+   "repeat": 1,
+   "trial": 3,
+   "config": {
+    "loss": "smooth_l1",
+    "smooth_l1_beta": 1.0,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "dropout": 0.1,
+    "sample_weighting": "none",
+    "low_price_weight": 1.0,
+    "calibration": "price_group_scale"
+   },
+   "config_hash": "0313605eddf58d95",
+   "search_objective": 0.014428716849764378
+  },
+  {
+   "arm": "random",
+   "repeat": 1,
+   "trial": 9,
+   "config": {
+    "loss": "smooth_l1",
+    "smooth_l1_beta": 0.328,
+    "learning_rate": 0.000546,
+    "weight_decay": 0.000141,
+    "dropout": 0.0692,
+    "sample_weighting": "date_balanced",
+    "low_price_weight": 0.844,
+    "calibration": "none"
+   },
+   "config_hash": "fcfd09add29b80ad",
+   "search_objective": 0.014421717032718
+  },
+  {
+   "arm": "bayes",
+   "repeat": 1,
+   "trial": 12,
+   "config": {
+    "loss": "l1",
+    "smooth_l1_beta": 1.0,
+    "learning_rate": 0.00115,
+    "weight_decay": 0.1,
+    "dropout": 0.0,
+    "sample_weighting": "date_balanced",
+    "low_price_weight": 1.0,
+    "calibration": "global_scale"
+   },
+   "config_hash": "affe230a347ff6a5",
+   "search_objective": 0.014374101335138908
+  },
+  {
+   "arm": "llm_batch",
+   "repeat": 1,
+   "trial": 10,
+   "config": {
+    "loss": "l1",
+    "smooth_l1_beta": 1.0,
+    "learning_rate": 0.001,
+    "weight_decay": 0.1,
+    "dropout": 0.0,
+    "sample_weighting": "date_balanced",
+    "low_price_weight": 1.0,
+    "calibration": "price_group_scale"
+   },
+   "config_hash": "78ba3b65e2490620",
+   "search_objective": 0.01437445155975852
+  },
+  {
+   "arm": "llm_feedback",
+   "repeat": 1,
+   "trial": 12,
+   "config": {
+    "loss": "l1",
+    "smooth_l1_beta": 1.0,
+    "learning_rate": 0.003,
+    "weight_decay": 0.0001,
+    "dropout": 0.0,
+    "sample_weighting": "date_balanced",
+    "low_price_weight": 1.0,
+    "calibration": "global_scale"
+   },
+   "config_hash": "c783173a7f300ed5",
+   "search_objective": 0.014361242854970072
+  }
+ ],
+ "script_sha256": "342d03c290f2ca4b10bc0fa3a0fc1eadba77f3f887da154fdd25786c1e5714f6"
+}
