@@ -217,6 +217,140 @@ def slide_search_figure(path: Path) -> None:
     plt.close(fig)
 
 
+SLIDE = {"paper": "#f7f6f2", "ink": "#14213d", "ink_2": "#4a5568", "rule": "#c3c2b7", "grid": "#e1e0d9",
+         "blue": "#1f5fbf", "light_blue": "#8fb8ef", "orange": "#e8833a", "gray": "#a3a196"}
+
+
+def slide_axes(width: float, height: float):
+    fig, ax = plt.subplots(figsize=(width, height))
+    fig.patch.set_facecolor(SLIDE["paper"])
+    ax.set_facecolor(SLIDE["paper"])
+    ax.tick_params(labelsize=17, colors=SLIDE["ink_2"], length=0)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.spines["bottom"].set_color(SLIDE["rule"])
+    return fig, ax
+
+
+def save_slide(fig, path: Path) -> None:
+    fig.savefig(path, dpi=160, bbox_inches="tight", pad_inches=0.25, facecolor=fig.get_facecolor())
+    plt.close(fig)
+
+
+def slide_task_figure(path: Path) -> None:
+    """A schematic of one example: six observed one-minute bars, then the minute to predict."""
+    bars = [(10.0, 10.6, 9.8, 10.4), (10.4, 10.9, 10.3, 10.8), (10.8, 10.9, 10.1, 10.2),
+            (10.2, 10.5, 9.9, 10.0), (10.0, 10.7, 9.9, 10.6), (10.6, 11.1, 10.5, 11.0)]
+    fig, ax = slide_axes(9.5, 4.6)
+    for index, (open_, high, low, close) in enumerate(bars):
+        color = SLIDE["blue"] if close >= open_ else SLIDE["orange"]
+        ax.plot([index, index], [low, high], color=color, linewidth=2.5, solid_capstyle="round")
+        ax.add_patch(plt.Rectangle((index - 0.28, min(open_, close)), 0.56, abs(close - open_) or 0.03,
+                                   facecolor=color, edgecolor=color))
+    ax.add_patch(plt.Rectangle((6 - 0.28, 10.55), 0.56, 0.9, facecolor="none", edgecolor=SLIDE["ink"],
+                               linewidth=2.2, linestyle=(0, (4, 3))))
+    ax.text(6, 11.0, "?", ha="center", va="center", fontsize=40, color=SLIDE["ink"], fontweight="bold")
+    ax.text(2.5, 9.45, "six observed minutes → 15 features", ha="center", fontsize=18, color=SLIDE["ink_2"])
+    ax.text(6, 9.45, "next minute", ha="center", fontsize=18, color=SLIDE["ink"], fontweight="bold")
+    ax.set_xlim(-0.6, 6.7)
+    ax.set_ylim(9.3, 11.6)
+    ax.set_xticks(range(7), ["t−5", "t−4", "t−3", "t−2", "t−1", "t", "t+1"])
+    ax.set_yticks([])
+    ax.spines["bottom"].set_visible(False)
+    save_slide(fig, path)
+
+
+def slide_baseline_figure(path: Path) -> None:
+    """Every MLP architecture's equal-date MAE relative to persistence on the validation dates."""
+    names = {"compact": "Compact (our baseline)", "wide": "Wide", "deep": "Deep", "standard": "Standard",
+             "batchnorm": "BatchNorm", "residual": "Residual", "standard_plain": "Standard, no dropout",
+             "shallow": "Shallow"}
+    table = pd.read_csv(ROOT / "reports/nifty_mlp_study/architecture_comparison.csv")
+    persistence = json.loads((ROOT / "reports/nifty_baseline_performance/summary.json").read_text())[
+        "persistence_metrics"]["val_day_mae"]
+    table["change"] = 100 * (table["val_day_mae_mean"] / persistence - 1)
+    table = table.sort_values("change", ascending=False)
+    fig, ax = slide_axes(9.5, 5.6)
+    for y, row in enumerate(table.itertuples()):
+        baseline = row.model == "compact"
+        ax.barh(y, row.change, height=0.62, color=SLIDE["orange"] if baseline else "#e9b48d")
+        ax.text(row.change + 0.03, y, f"+{row.change:.2f}%", va="center", fontsize=16, color=SLIDE["ink"],
+                fontweight="bold" if baseline else "normal")
+    ax.set_yticks(range(len(table)), [names[model] for model in table.model], fontsize=17)
+    for label, model in zip(ax.get_yticklabels(), table.model, strict=True):
+        label.set_fontweight("bold" if model == "compact" else "normal")
+        label.set_color(SLIDE["ink"])
+    ax.axvline(0, color=SLIDE["ink"], linewidth=2)
+    ax.text(0.02, len(table) - 0.35, "“no change” forecast", fontsize=16, color=SLIDE["ink"], va="bottom")
+    ax.set_xlim(0, max(table.change) * 1.25)
+    ax.set_ylim(-0.6, len(table) - 0.1)
+    ax.set_xlabel("typical error above “no change” (equal-date MAE, %)", fontsize=17, color=SLIDE["ink_2"],
+                  labelpad=10)
+    ax.grid(axis="x", color=SLIDE["grid"], linewidth=1)
+    ax.set_axisbelow(True)
+    save_slide(fig, path)
+
+
+def slide_folds_figure(path: Path) -> None:
+    """Which dates trained, tuned and scored each evaluation: no window ever sees its future."""
+    protocol = json.loads((ROOT / "reports/nifty_llm_search/protocol.json").read_text())
+    rows = [(f"Search fold {number}", window) for number, window in enumerate(protocol["search"]["windows"], 1)]
+    for label, plan in [("Validation check", "validation"), ("Final test", "test")]:
+        result = min((ROOT / f"reports/nifty_llm_search/results/{plan}/seed42").glob("*.json"))
+        rows.append((label, json.loads(result.read_text())["windows"][0]))
+    colors_ = {"fit": "#cde2fb", "tune": SLIDE["light_blue"], "score": SLIDE["blue"]}
+    fig, ax = slide_axes(12, 4.8)
+    for index, (label, window) in enumerate(rows):
+        y = len(rows) - 1 - index
+        for part in ["fit", "tune", "score"]:
+            first, last = pd.Timestamp(window[part]["first_date"]), pd.Timestamp(window[part]["last_date"])
+            ax.barh(y, (last - first).days + 1, left=first, height=0.6, color=colors_[part], edgecolor=SLIDE["paper"],
+                    linewidth=1)
+        ax.text(pd.Timestamp("2016-11-20"), y, label, ha="right", va="center", fontsize=18,
+                color=SLIDE["ink"], fontweight="bold" if index >= 3 else "normal")
+    ax.set_yticks([])
+    ax.set_ylim(-0.7, len(rows) - 0.3)
+    ax.set_xlim(pd.Timestamp("2016-12-01"), pd.Timestamp("2021-01-10"))
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+    handles = [plt.Rectangle((0, 0), 1, 1, color=colors_[part]) for part in ["fit", "tune", "score"]]
+    ax.legend(handles, ["train", "tune (stop early, calibrate)", "score"], loc="upper center", ncols=3,
+              fontsize=17, frameon=False, bbox_to_anchor=(0.5, -0.12))
+    save_slide(fig, path)
+
+
+def slide_heldout_figure(path: Path) -> None:
+    """Each search's chosen setting on the validation and the test dates, relative to persistence."""
+    report = ROOT / "reports/nifty_llm_search"
+    validation = {row["arm"]: row for row in json.loads((report / "confirmation/results.json").read_text())["selections"]}
+    test = {row["arm"]: row for row in json.loads((report / "final_test/results.json").read_text())["selections"]}
+    rows = [("llm_feedback", "LLM + feedback"), ("llm_batch", "LLM, no feedback"), ("bayes", "Bayesian optimization"),
+            ("random", "Random search"), ("gpt_hypotheses", "Planning-note ideas"), ("baseline", "Original setting")]
+    fig, ax = slide_axes(11, 6.2)
+    for index, (arm, label) in enumerate(rows):
+        y = len(rows) - 1 - index
+        for offset, results, color in [(0.19, validation, SLIDE["light_blue"]), (-0.19, test, SLIDE["blue"])]:
+            gain = -results[arm]["day_mae_vs_persistence_pct"]
+            ax.barh(y + offset, gain, height=0.36, color=color)
+            if results is test:
+                ax.text(gain + (0.015 if gain >= 0 else -0.015), y + offset, f"{gain:+.2f}%".replace("-", "−"), va="center",
+                        ha="left" if gain >= 0 else "right", fontsize=16, color=SLIDE["ink"],
+                        fontweight="bold" if arm == "llm_feedback" else "normal")
+    ax.set_yticks(range(len(rows)), [label for _, label in rows][::-1], fontsize=17)
+    for label in ax.get_yticklabels():
+        label.set_color(SLIDE["ink"])
+        label.set_fontweight("bold" if label.get_text() == "LLM + feedback" else "normal")
+    ax.axvline(0, color=SLIDE["ink"], linewidth=2)
+    ax.set_xlim(-0.35, 1.05)
+    ax.set_xlabel("error reduction vs “no change” (equal-date MAE, %), right = better", fontsize=17,
+                  color=SLIDE["ink_2"], labelpad=10)
+    ax.grid(axis="x", color=SLIDE["grid"], linewidth=1)
+    ax.set_axisbelow(True)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=SLIDE["light_blue"]), plt.Rectangle((0, 0), 1, 1, color=SLIDE["blue"])]
+    ax.legend(handles, ["validation (Oct 2019 – May 2020)", "test (Jun – Dec 2020, scored once)"], loc="lower right",
+              fontsize=16, frameon=False)
+    save_slide(fig, path)
+
+
 # --- Markdown subset → reportlab flowables ------------------------------------------------------------------
 
 def link_target(target: str) -> str:
@@ -407,6 +541,10 @@ def build() -> None:
     pipeline_figure(FIGURES / "pipeline.png")
     timeline_figure(FIGURES / "timeline.png")
     slide_search_figure(FIGURES / "slide_search.png")
+    slide_task_figure(FIGURES / "slide_task.png")
+    slide_baseline_figure(FIGURES / "slide_baseline.png")
+    slide_folds_figure(FIGURES / "slide_folds.png")
+    slide_heldout_figure(FIGURES / "slide_heldout.png")
     register_fonts()
     style = styles()
     document = SummaryDocument(str(OUTPUT), pagesize=letter, leftMargin=2.1 * cm, rightMargin=2.1 * cm,
