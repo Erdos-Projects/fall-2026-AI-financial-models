@@ -340,3 +340,68 @@ The final test set remains reserved.
 The builder checks the saved evidence hashes and reconstructs the headline
 metrics from daily diagnostics. See its [audit summary](reports/nifty_baseline_performance/summary.json).
 <!-- BASELINE_PERFORMANCE_END -->
+
+<!-- LLM_SEARCH_START -->
+## LLM-guided improvement search (pilot)
+
+Question: *can an LLM use model diagnostics to find improvements to the fixed
+compact MLP more efficiently than conventional tuning, under the same experiment
+budget?* Read the [running report](reports/nifty_llm_search/report.md), the
+[predeclared protocol](reports/nifty_llm_search/protocol.json), and the exact
+[brief the LLM receives](reports/nifty_llm_search/brief.md).
+
+Five searches propose settings for the unchanged `15→32→16→1` network from one
+eight-parameter space: loss and Smooth L1 beta, learning rate, weight decay,
+dropout, date-balanced weighting, low-price row weighting, and an output
+calibration multiplier fitted on held-out tune dates. The searches are uniform
+random search, Optuna Gaussian-process Bayesian optimization, an LLM proposing
+all 12 settings at once without feedback, an LLM proposing one setting at a time
+with measured diagnostic feedback, and the three hypotheses from the project's
+GPT planning notes. Each search gets 12 proposals (GPT's arm: 3); invalid
+proposals and duplicates use budget.
+
+Every proposal is trained on three expanding forward folds inside the original
+training dates, with fold-specific feature/target scaling, early stopping and
+calibration on tune dates, and scoring on later dates. Before any search, the
+new runner reproduced the frozen checkpoint's weights and validation predictions
+bit for bit. Each search's best configuration is then refit with three seeds and
+confirmed on the original validation dates. The reserved test dates are opened
+only by an explicit, run-once `--final-test` step, which has not been run.
+
+**Pilot result (November 2, 2026).** All five searches and the validation
+confirmation are complete. Fresh Claude Opus 5.5 subagents answered the prompts,
+each seeing only its prompt file ([relay record](reports/nifty_llm_search/llm_relay.md)).
+Both LLM searches reached strong configurations within two proposals; Bayesian
+optimization needed twelve. On the 150 validation dates, the feedback search's
+selection had equal-date MAE **0.589% below persistence**, against 0.480% for
+Bayesian and 0.053% for random search. The strong configurations share L1 loss,
+date-balanced weighting and no dropout. One search per method cannot separate
+method quality from luck, and the gains on price error are much smaller; read
+the [findings](reports/nifty_llm_search/findings.md) for these caveats.
+
+The LLM has no API connection: the runner writes numbered prompts, and a person
+or a fresh, isolated agent relays them to a chat model. Use a **new temporary
+chat for every prompt** (memory and personalization off, no browsing or code
+tools), and paste the complete reply back:
+
+```bash
+.conda/bin/python scripts/run_nifty_llm_search.py --init          # protocol + shared baseline
+for arm in gpt_hypotheses random bayes; do
+  .conda/bin/python scripts/run_nifty_llm_search.py --arm $arm
+done
+.conda/bin/python scripts/run_nifty_llm_search.py --arm llm_batch --wait     # one terminal each;
+.conda/bin/python scripts/run_nifty_llm_search.py --arm llm_feedback --wait  # they resume if restarted
+.conda/bin/python scripts/nifty_llm_handoff.py status
+.conda/bin/python scripts/nifty_llm_handoff.py show llm_feedback             # copies the prompt
+.conda/bin/python scripts/nifty_llm_handoff.py submit llm_feedback --model "<model name>"  # reads the clipboard
+.conda/bin/python scripts/confirm_nifty_llm_search.py                        # after every search finishes
+.conda/bin/python scripts/build_nifty_llm_search_report.py
+.conda/bin/python -m pytest -q tests/test_nifty_llm_search.py
+```
+
+The runner refuses to continue if any result-affecting source file changes after
+the protocol is written. Prompts, replies, trial logs and per-configuration fold
+results are small text files under `reports/nifty_llm_search/`; checkpoints are
+Git-ignored under `data/processed/nifty_llm_search/`. Add `--smoke` to the runner
+and handoff commands for a 2-minute end-to-end check on 20,000-row windows.
+<!-- LLM_SEARCH_END -->

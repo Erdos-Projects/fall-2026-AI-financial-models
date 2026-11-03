@@ -1,0 +1,100 @@
+{
+  "proposals": [
+    {
+      "hypothesis": "Baseline predictions help close<=1 rows (MAE -1.04%, RMSE -8.80%) but hurt close>1 rows (MAE +0.21%, RMSE +0.64%), and close>1 rows carry about 85% of persistence MAE (fold-1 fit: 0.973*0.0140 vs 0.027*0.0917). With beta=1 the loss is quadratic for ~99% of rows (99% |y| quantile = 1.11 std), so the net fits conditional means driven by low-price rows (99.25% of the squared-error reduction in the earlier test) and leaks that signal into close>1 rows. Separate tune-fitted multipliers should shrink close>1 predictions toward persistence while keeping the close<=1 signal.",
+      "change": "Proposal 1 of 12 (later proposals cite others by list position): baseline with calibration none -> price_group_scale; all training settings unchanged.",
+      "predicted_change_pct": -0.12,
+      "expected_effect": "Fitted close>1 alpha well below the close<=1 alpha (below 0.5 in most folds); close>1 MAE vs persistence moves from +0.21% to about 0%; close<=1 MAE stays negative; objective about -0.1% vs persistence; pooled RMSE gain mostly kept because it comes from close<=1 rows.",
+      "rejection_criterion": "Objective not at least 0.05% below the baseline (i.e. above 0.014441), or the close>1 alpha is not lower than the close<=1 alpha in at least 2 of 3 folds.",
+      "config": {"loss": "smooth_l1", "smooth_l1_beta": 1.0, "learning_rate": 0.001, "weight_decay": 0.0001, "dropout": 0.1, "sample_weighting": "none", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Equal-date MAE is minimized by the conditional median, not the mean. The target has 16.8% exact zeros and very heavy tails (99.9% |y| quantile 13 std, max 76 std; close>1 std 0.0835 vs mean |y| 0.0140), so the near-MSE baseline fits tail noise (its close>1 RMSE is even worse than persistence). L1 on the scaled target minimizes training MAE directly with bounded, equal per-row gradients, so the 97.3% close>1 rows drive learning; date_balanced turns the training loss into the fit-window version of the equal-date objective. Dropout is removed because a ~1,060-parameter net on 4-6 million rows cannot overfit rows and dropout only adds noise. price_group_scale guards against a price group that does not transfer.",
+      "change": "From baseline: loss smooth_l1 -> l1; dropout 0.1 -> 0; sample_weighting none -> date_balanced; calibration none -> price_group_scale (learning_rate 0.001 and weight_decay 0.0001 unchanged).",
+      "predicted_change_pct": -0.4,
+      "expected_effect": "close>1 MAE vs persistence turns negative; close<=1 MAE stays negative; dates better than persistence rise well above 23-26/80; pooled RMSE gain shrinks toward 0% because median forecasts ignore the tails; prediction-size ratio at or below 0.084; fitted alphas near 1 if the median fit transfers.",
+      "rejection_criterion": "Objective not below proposal 1's objective, or close>1 MAE vs persistence >= 0 in at least 2 of 3 folds.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.001, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "With the baseline, tune MAE was best after epoch 1 in every fold and then worsened while training-sample MAE kept falling, so one epoch at lr 0.001 already passes the point that transfers across time. Under L1 a lower learning rate gives early stopping finer resolution and less step noise in the restored weights; with a large zero mass every spurious nonzero forecast costs MAE linearly.",
+      "change": "From proposal 2: learning_rate 0.001 -> 0.0003.",
+      "predicted_change_pct": -0.45,
+      "expected_effect": "Best epoch later than 1 in at least 2 folds with tune MAE improving over several epochs; same subgroup pattern as proposal 2; objective slightly below proposal 2.",
+      "rejection_criterion": "Objective above proposal 2's objective, or best epoch still 1 in all three folds.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.0003, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Rows per date vary 16-fold (2,042 to 32,794). Unweighted training emphasizes busy dates, which may resemble the later score windows more than the quiet dates that date_balanced up-weights, so under L1 row weighting may transfer as well as or better than date balancing despite being less aligned with the equal-date objective.",
+      "change": "From proposal 3: sample_weighting date_balanced -> none.",
+      "predicted_change_pct": -0.4,
+      "expected_effect": "Objective within 0.1% of proposal 3; if busy dates are more representative, folds 2 and 3 gain relative to proposal 3 while fold 1 does not.",
+      "rejection_criterion": "Objective more than 0.05% above proposal 3's objective.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.0003, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "none", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Isolates the loss change: if median targeting is the main lever, switching only the loss to L1 (plus price_group_scale) should capture most of the gain even with the baseline's dropout 0.1 and row weighting.",
+      "change": "From baseline: loss smooth_l1 -> l1; calibration none -> price_group_scale.",
+      "predicted_change_pct": -0.3,
+      "expected_effect": "close>1 MAE vs persistence negative; objective below proposal 1 and slightly above proposal 2 if dropout noise and row weighting cost a little.",
+      "rejection_criterion": "Objective not below proposal 1's objective.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.001, "weight_decay": 0.0001, "dropout": 0.1, "sample_weighting": "none", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "If even lr 0.0003 overshoots early, lr 0.00015 still gives about 12,000-17,000 AdamW steps to a ~1,060-parameter net (the small median offsets need only small output weights, which start at zero), and the slowest trajectory lets early stopping pick the most transferable point.",
+      "change": "From proposal 3: learning_rate 0.0003 -> 0.00015.",
+      "predicted_change_pct": -0.4,
+      "expected_effect": "Best epoch 4 or later in most folds; training-sample MAE falls steadily; objective close to proposal 3.",
+      "rejection_criterion": "Objective more than 0.05% above proposal 3's objective, or tune MAE still improving at epoch 12 in all folds (undertrained).",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.00015, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Hedge against L1 collapsing to persistence if conditional medians are near zero for most rows (16.8% zeros overall, 66.4% for close<=1). Beta 0.3 std (0.029 log) is quadratic for about 90% of rows but linear for the heavy close>1 tails and almost all nonzero close<=1 moves (their mean |y| is about 0.27 log, 2.8 std), so it keeps mean-type bounce signal (baseline close<=1 MAE -1.04%) while capping the tail noise that made baseline close>1 RMSE worse than persistence.",
+      "change": "From baseline: smooth_l1_beta 1 -> 0.3; learning_rate 0.001 -> 0.0005; dropout 0.1 -> 0; calibration none -> price_group_scale.",
+      "predicted_change_pct": -0.2,
+      "expected_effect": "close>1 MAE vs persistence better than the baseline's +0.21% but less negative than in the L1 proposals; pooled RMSE gain larger than in the L1 proposals; objective below proposal 1.",
+      "rejection_criterion": "Objective not below proposal 1's objective.",
+      "config": {"loss": "smooth_l1", "smooth_l1_beta": 0.3, "learning_rate": 0.0005, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "none", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Beta 0.03 std (0.0029 log) makes the loss linear for roughly two thirds of rows (median |y| is 0.066 std), so it still targets nearly the conditional median like L1, but its quadratic core smooths the gradients of the 16.8% exact zeros, which under L1 flip sign whenever a forecast crosses zero.",
+      "change": "From proposal 2: loss l1 -> smooth_l1 with smooth_l1_beta 0.03; learning_rate 0.001 -> 0.0005.",
+      "predicted_change_pct": -0.45,
+      "expected_effect": "Subgroup pattern like the L1 proposals; objective at or below the better of proposals 2 and 3.",
+      "rejection_criterion": "Objective above both proposal 2's and proposal 3's objectives.",
+      "config": {"loss": "smooth_l1", "smooth_l1_beta": 0.03, "learning_rate": 0.0005, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Beta 0.1 std (0.0098 log, roughly the 60th percentile of |y|) is a Huber compromise: quadratic in the dense center, which is smoother and statistically more efficient than pure L1, but linear in the tails (99% quantile 1.11 std), so extreme rows cannot dominate.",
+      "change": "From proposal 8: smooth_l1_beta 0.03 -> 0.1.",
+      "predicted_change_pct": -0.35,
+      "expected_effect": "Objective between proposals 8 and 7 if MAE gains fall as beta grows; slightly larger forecasts and better pooled RMSE than proposal 8; close>1 MAE vs persistence still negative.",
+      "rejection_criterion": "Objective not below proposal 1's objective, or close>1 MAE vs persistence >= 0 in at least 2 of 3 folds.",
+      "config": {"loss": "smooth_l1", "smooth_l1_beta": 0.1, "learning_rate": 0.0005, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "Baseline tune MAE degraded after epoch 1 while training MAE improved, a sign of fitting fit-window-specific structure. Decoupled weight decay 0.1 at lr 0.001 shrinks weights by about 10-13% per epoch, pruning weakly supported weights and pulling forecasts toward persistence, which should transfer better to later dates.",
+      "change": "From proposal 2: weight_decay 0.0001 -> 0.1.",
+      "predicted_change_pct": -0.4,
+      "expected_effect": "Smaller prediction-size ratio than proposal 2, fitted alphas closer to 1, best epoch equal or later; objective at or below proposal 2.",
+      "rejection_criterion": "Objective more than 0.05% above proposal 2's objective.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.001, "weight_decay": 0.1, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "price_group_scale"}
+    },
+    {
+      "hypothesis": "An L1 model is median-calibrated by construction, so tune-fitted alphas may only add noise, and tune windows can mislead: in fold 2 the baseline's tune MAE was worse than persistence at every epoch (+0.17% to +0.30%) while its score MAE beat persistence (-0.06%). Without calibration, early stopping and scoring use raw L1 forecasts.",
+      "change": "From proposal 3: calibration price_group_scale -> none.",
+      "predicted_change_pct": -0.25,
+      "expected_effect": "Objective within 0.1% of proposal 3: better in folds where proposal 3's alphas are shrunk by an unrepresentative tune window (likely fold 2), worse where shrinkage was needed.",
+      "rejection_criterion": "Objective more than 0.05% above proposal 3's objective.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.0003, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "date_balanced", "low_price_weight": 1.0, "calibration": "none"}
+    },
+    {
+      "hypothesis": "Close<=1 rows (2.7% of rows, 66.4% zeros, std 0.321) are a tick-dominated regime whose MAE gains did not persist out of sample (later 150 dates: close<=1 MAE +0.07%). Down-weighting them lets the small network specialize on close>1 rows, which carry about 85% of persistence MAE, while price_group_scale limits damage on low-price rows.",
+      "change": "From proposal 4: low_price_weight 1 -> 0.1.",
+      "predicted_change_pct": -0.3,
+      "expected_effect": "close>1 MAE vs persistence lower than in proposal 4; close<=1 MAE nearer 0% with a smaller close<=1 alpha; objective close to proposal 4.",
+      "rejection_criterion": "close>1 MAE vs persistence not lower than proposal 4's, or objective more than 0.05% above proposal 4's objective.",
+      "config": {"loss": "l1", "smooth_l1_beta": 1.0, "learning_rate": 0.0003, "weight_decay": 0.0001, "dropout": 0.0, "sample_weighting": "none", "low_price_weight": 0.1, "calibration": "price_group_scale"}
+    }
+  ]
+}
