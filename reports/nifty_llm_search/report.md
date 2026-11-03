@@ -2,7 +2,7 @@
 
 Interpretation, limitations and next steps: [findings](findings.md).
 
-Built 2026-11-02 from saved files; this builder trains nothing. Study protocol written 2026-11-02 before any search training. **The reserved June–December 2020 test dates have not been evaluated.**
+Built 2026-11-02 from saved files; this builder trains nothing. Study protocol written 2026-11-02 before any search training. The frozen selections were evaluated once on the reserved June–December 2020 test dates (2026-11-03).
 
 **Status:** Random search 12/12, Bayesian (GP) 12/12, LLM, no feedback 12/12, LLM + feedback 12/12, GPT's 3 hypotheses 3/3. Confirmation: complete.
 
@@ -73,6 +73,23 @@ Each search's selected configuration and the baseline configuration were refit w
 Persistence equal-date MAE: 0.0148986. The unchanged frozen checkpoint scores 0.0149292 but was early-stopped on these dates, so it is a reference rather than a fair comparator. Intervals come from a circular block bootstrap over dates (block 5) of seed-averaged daily differences; they describe variation across these dates, not uncertainty over future markets.
 
 ![Confirmation](figures/confirmation.png)
+
+## Final test on the reserved June–December 2020 dates
+
+After confirmation, the six frozen selections were refit once more with the same three seeds under the predeclared test plan: fit on training dates 0–809 (through the first 110 validation dates), tune on dates 810–849, and score once on the 150 reserved test dates. No search, selection or prompt used these dates.
+
+| Selection | Trial | Equal-date MAE (3-seed mean) | vs baseline config [paired 95%] | vs persistence | RMSE vs persistence | Price MAE vs persistence | Dates better than persistence |
+|---|---|---|---|---|---|---|---|
+| Baseline config | - | 0.0132972 | +0.000% | +0.138% | -7.21% | +0.05% | 41/150 |
+| GPT's 3 hypotheses | 3 | 0.0132516 | -0.343% [-0.493, -0.208] | -0.205% | -7.09% | +0.00% | 19/150 |
+| Random search | 9 | 0.0132653 | -0.240% [-0.403, -0.116] | -0.102% | -5.17% | -0.05% | 52/150 |
+| Bayesian (GP) | 12 | 0.0131788 | -0.890% [-1.329, -0.561] | -0.754% | -4.41% | -0.14% | 102/150 |
+| LLM, no feedback | 10 | 0.0131766 | -0.907% [-1.347, -0.575] | -0.770% | -4.39% | -0.16% | 106/150 |
+| LLM + feedback | 12 | 0.0131588 | -1.040% [-1.586, -0.628] | -0.904% | -4.39% | -0.14% | 102/150 |
+
+Persistence equal-date MAE: 0.0132788. The unchanged frozen checkpoint scores 0.0132805; it never saw these dates, but it was trained only on dates before October 2019, whereas the refit selections also learned from most validation dates. The baseline configuration refit under the identical plan is the like-for-like comparator.
+
+![Final test](figures/final_test.png)
 
 ## Caveats
 

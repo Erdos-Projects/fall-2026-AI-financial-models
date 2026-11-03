@@ -1,15 +1,88 @@
 # fall-2026-AI-financial-models
-Team project: fall-2026-AI-financial-models
 
-Environment for neural option pricing, numerical model validation, historical
-option-data analysis, and structured LLM test proposals. This repository currently
-contains environment configuration, local Nifty data, EDA, preprocessing, and
-reproducible neural forecasting baselines; the earlier
-synthetic benchmark described in the project handoff is not included here.
+**Can an LLM improve a forecasting model faster than conventional tuning?** This team project builds a
+next-minute return forecaster for Nifty index options from 17.6 million one-minute bars, establishes
+conventional baselines, and then compares LLM-guided model improvement with random search and Bayesian
+optimization under the same experiment budget. It ends with one evaluation on reserved test dates.
 
-Latest check-in: [baseline performance](reports/nifty_baseline_performance/report.md)
-and [short answers](reports/nifty_baseline_performance/check_in.md).
-Previous check-in: [MLP architecture comparison](reports/nifty_mlp_study/report.md).
+**Read the full story in the [project summary (PDF)](reports/project_summary/project_summary.pdf)**
+([Markdown source](reports/project_summary/project_summary.md)), from motivation to conclusions.
+
+## Project design
+
+```mermaid
+flowchart LR
+    A["Data audit<br/>17.6M one-minute bars"] --> B["Preprocessing<br/>11.5M examples"]
+    B --> C["Baselines<br/>persistence, ridge, MLPs"]
+    C --> D["Architecture study<br/>8 MLPs x 3 seeds"]
+    D --> E["Diagnosis<br/>MAE worse than persistence"]
+    E --> F["Improvement search<br/>5 methods x 12 proposals"]
+    F --> G["Confirmation<br/>validation dates, 3 seeds"]
+    G --> H["Final test<br/>Jun-Dec 2020, once"]
+```
+
+**Task.** Predict the next-minute log return `ln(close[t+1] / close[t])` of an option from 15 features
+summarizing its previous six bars. **Metric:** equal-date MAE (each date weighted equally); the reference
+forecast is persistence, i.e. no price change.
+
+**Splits.** All splits are chronological by date:
+
+| Split | Dates | Period | Examples |
+|---|---|---|---|
+| Training | 700 | 2016-12-14 to 2019-10-17 | 7.07M |
+| Validation | 150 | 2019-10-18 to 2020-05-29 | 2.01M |
+| Test (reserved) | 150 | 2020-06-01 to 2020-12-31 | 2.39M |
+
+## Experiments
+
+| Stage | Purpose | Outcome | Details |
+|---|---|---|---|
+| 1. Data audit | Check what the raw files contain and whether they support option pricing | 3,137 unique files (byte-identical CSV/TXT copies removed); no contract master, underlying price or quotes, so we forecast empirically instead | [notebook](notebooks/01_nifty_eda.ipynb), [report](reports/nifty_eda/eda.html) |
+| 2. Preprocessing | Build a leakage-safe supervised dataset | 11.5M examples, 15 features, training-only scaling | [notebook](notebooks/02_nifty_preprocessing.ipynb) |
+| 3. Baselines | Fix reference models | Ridge loses to persistence; the compact `15→32→16→1` MLP is frozen as the reference | [notebook](notebooks/03_nifty_models.ipynb) |
+| 4. Architecture study | Test whether size or structure helps | None of 8 MLP families × 3 seeds beats persistence on equal-date MAE; RMSE about 5% better | [report](reports/nifty_mlp_study/report.md) |
+| 5. Baseline diagnosis | Find where and why the MLP fails | MAE +0.21% vs persistence. The gains sit in options priced ≤ 1, and the loss behaves like squared error, so the model predicts a mean where MAE needs a median | [report](reports/nifty_baseline_performance/report.md) |
+| 6. LLM-guided search | Can an LLM find improvements faster than random or Bayesian search? | LLM searches reach strong settings in 2 proposals, Bayesian search in 12. The winning recipe is L1 loss, date-balanced weighting and no dropout | [report](reports/nifty_llm_search/report.md), [findings](reports/nifty_llm_search/findings.md) |
+| 7. Final test | One untouched evaluation of the frozen selections | Same ranking on the reserved Jun–Dec 2020 dates: LLM + feedback 0.90% below persistence, LLM without feedback 0.77%, Bayesian 0.75%, random 0.10%. The original configuration was 0.14% worse than persistence | [report](reports/nifty_llm_search/report.md#final-test-on-the-reserved-junedecember-2020-dates) |
+
+## Conclusions
+
+- **The LLM found the fix faster, not a fix others could not find.** Both LLM searches reached a strong
+  configuration by their second proposal; Bayesian optimization needed its twelfth, and random search never
+  got there.
+- **The fix was to train on what is graded.** Use L1 loss, which targets the median rather than the mean;
+  weight every date equally; and drop dropout. The original Smooth L1 loss behaved like squared error, which
+  is why the baseline improved RMSE but lost to persistence on MAE.
+- **The ranking held on unseen dates.** On the reserved test dates, the feedback LLM's configuration beat
+  persistence by **0.90%** in equal-date MAE (0.59% on validation dates). That put it ahead of the
+  no-feedback LLM (0.77%) and Bayesian optimization (0.75%). Its edge over Bayesian optimization is small:
+  0.15% on test.
+- **This is a pilot.** Each method ran one search, so it does not show that the LLM is a better optimizer in
+  general. The feedback LLM's reasoning cost about 1.26 million tokens, and these are forecast-error gains,
+  not trading results. The next steps are repeated searches, a score-only feedback ablation, and LLM-proposed
+  features.
+
+## Quick start
+
+```bash
+conda env create --prefix ./.conda --file environment.yml
+conda activate ./.conda
+python -m pytest -q
+```
+
+The raw Nifty files and every generated array or checkpoint stay local and Git-ignored. Each stage has its
+own script; the reports directory keeps the protocols, small tables, figures and verification records.
+The detailed notes below list every command.
+
+| Path | Contents |
+|---|---|
+| `scripts/` | data audit, preprocessing, model training, LLM search runner, report and summary builders |
+| `notebooks/` | EDA, preprocessing and baseline walkthroughs |
+| `reports/` | per-stage reports, protocols, figures, prompts and replies, and the project summary |
+| `tests/` | unit tests on synthetic data |
+
+<details>
+<summary><b>Detailed stage notes</b>: environment, data handling, and each stage's commands and results</summary>
 
 ## Setup
 
@@ -366,7 +439,8 @@ calibration on tune dates, and scoring on later dates. Before any search, the
 new runner reproduced the frozen checkpoint's weights and validation predictions
 bit for bit. Each search's best configuration is then refit with three seeds and
 confirmed on the original validation dates. The reserved test dates are opened
-only by an explicit, run-once `--final-test` step, which has not been run.
+only by an explicit, run-once `--final-test` step. It ran on November 2, 2026,
+after every selection was frozen, and refuses to run again.
 
 **Pilot result (November 2, 2026).** All five searches and the validation
 confirmation are complete. Fresh Claude Opus 5.5 subagents answered the prompts,
@@ -374,10 +448,13 @@ each seeing only its prompt file ([relay record](reports/nifty_llm_search/llm_re
 Both LLM searches reached strong configurations within two proposals; Bayesian
 optimization needed twelve. On the 150 validation dates, the feedback search's
 selection had equal-date MAE **0.589% below persistence**, against 0.480% for
-Bayesian and 0.053% for random search. The strong configurations share L1 loss,
-date-balanced weighting and no dropout. One search per method cannot separate
-method quality from luck, and the gains on price error are much smaller; read
-the [findings](reports/nifty_llm_search/findings.md) for these caveats.
+Bayesian and 0.053% for random search. On the reserved June–December 2020 test
+dates, the same three selections kept their order: 0.904%, 0.770% and 0.754%
+below persistence for the feedback LLM, no-feedback LLM and Bayesian
+optimization. The strong configurations share L1 loss, date-balanced weighting
+and no dropout. One search per method cannot separate method quality from luck,
+and the gains on price error are much smaller; read the
+[findings](reports/nifty_llm_search/findings.md) for these caveats.
 
 The LLM has no API connection: the runner writes numbered prompts, and a person
 or a fresh, isolated agent relays them to a chat model. Use a **new temporary
@@ -405,3 +482,5 @@ results are small text files under `reports/nifty_llm_search/`; checkpoints are
 Git-ignored under `data/processed/nifty_llm_search/`. Add `--smoke` to the runner
 and handoff commands for a 2-minute end-to-end check on 20,000-row windows.
 <!-- LLM_SEARCH_END -->
+
+</details>

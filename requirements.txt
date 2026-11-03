@@ -15,6 +15,9 @@ pyarrow>=17,<21
 # Gaussian-process Bayesian optimization comparator for the LLM-guided search.
 optuna>=4.9,<5
 
+# Project summary PDF (scripts/build_project_summary.py).
+reportlab>=4,<5
+
 # Analysis and plots.
 matplotlib>=3.9,<4
 seaborn>=0.13,<0.14

@@ -1,10 +1,10 @@
 # Findings: LLM-guided improvement search, pilot (one search per method)
 
-Written November 2, 2026, after every search and the confirmation stage had finished. The data are in the [report](report.md) and the [protocol](protocol.json), which was written before any search training. The reserved June–December 2020 test dates have **not** been evaluated.
+Written November 2, 2026, after every search and the confirmation stage had finished, and updated the same day after the run-once final test on the reserved June–December 2020 dates. The data are in the [report](report.md) and the [protocol](protocol.json), which was written before any search training.
 
 ## Short answer
 
-In this pilot, both LLM searches reached strong configurations within **two proposals**; Bayesian optimization needed all twelve to get there. The search that received diagnostic feedback finished best, and the ranking held on the 150 later validation dates. However:
+In this pilot, both LLM searches reached strong configurations within **two proposals**; Bayesian optimization needed all twelve to get there. The search that received diagnostic feedback finished best. Its ranking ahead of the no-feedback LLM and Bayesian optimization held on the 150 later validation dates and again on the 150 reserved test dates, where it beat persistence by **0.90%** in equal-date MAE. However:
 
 - Each method ran **one search**, so this cannot tell a better method apart from a lucky search.
 - The gaps between the top three methods are small: 0.06–0.11% in paired comparisons.
@@ -60,6 +60,41 @@ The feedback selection's average advantage comes from fewer, larger daily wins. 
 
 These intervals describe variation across dates for **fixed** selected configurations. They say nothing about how much a repeated search would vary. Search-to-search variation is the uncertainty that matters for "which method is better", and one search per method cannot measure it.
 
+## Final test (run once, after all selections were frozen)
+
+The six frozen selections were refit with the same three seeds under the predeclared test plan:
+- **fit:** dates 0–809, 2016-12-14 to 2020-03-26
+- **tune:** dates 810–849, 2020-03-27 to 2020-05-29
+- **score:** once, on the 150 reserved dates from 2020-06-01 to 2020-12-31
+
+No search, selection or prompt had used these dates.
+
+| Selection | Test equal-date MAE (3 seeds) | vs baseline config [paired 95%] | vs persistence | Dates better than persistence | Price MAE vs persistence |
+|---|---|---|---|---|---|
+| **LLM + feedback** | 0.0131588 | **−1.040%** [−1.586, −0.628] | **−0.904%** | 102/150 | −0.14% |
+| LLM, no feedback | 0.0131766 | −0.907% [−1.347, −0.575] | −0.770% | 106/150 | −0.16% |
+| Bayesian | 0.0131788 | −0.890% [−1.329, −0.561] | −0.754% | 102/150 | −0.14% |
+| GPT's hypothesis 3 | 0.0132516 | −0.343% [−0.493, −0.208] | −0.205% | 19/150 | +0.00% |
+| Random | 0.0132653 | −0.240% [−0.403, −0.116] | −0.102% | 52/150 | −0.05% |
+| Baseline config | 0.0132972 | – | +0.138% | 41/150 | +0.05% |
+
+**Reference scores.** Persistence scored 0.0132788. The unchanged frozen checkpoint scored 0.0132805 (+0.013%). It never saw these dates, but it was trained only on data before October 2019, so the refit baseline configuration is the like-for-like comparator.
+
+**What the test confirms.**
+- The top three keep their validation order: feedback, then no feedback, then Bayesian.
+- The gains over persistence are larger than on validation.
+- All three strong selections now also improve price MAE slightly.
+
+**Exploratory paired comparison with Bayesian on the test dates:**
+
+| Comparison | Mean difference | 95% interval | Dates where the first is better |
+|---|---|---|---|
+| LLM + feedback minus Bayesian | −0.151% | [−0.270, −0.061] | 90/150 |
+| LLM, no feedback minus Bayesian | −0.017% | [−0.031, −0.004] | 84/150 |
+| LLM + feedback minus LLM, no feedback | −0.135% | [−0.252, −0.045] | 75/150 |
+
+These describe fixed selected configurations, not repeated searches.
+
 ## What the searches found
 
 **The shared recipe.** The three strong selections share **L1 loss, date-balanced sample weighting and no dropout**.
@@ -103,5 +138,5 @@ These intervals describe variation across dates for **fixed** selected configura
 
 1. **Repeat each search** two more times: new random/GP seeds and fresh LLM conversations, same protocol. This would show whether the LLM's early-proposal advantage is consistent.
 2. **Score-only ablation.** Run an LLM search whose feedback contains only the objective, no diagnostics, to test whether the diagnostics themselves add value.
-3. **Final test.** Once selections are final, evaluate them once on the reserved test dates (`confirm_nifty_llm_search.py --final-test`). This requires the team's approval and should not be repeated.
+3. **Do not rerun the final test.** It has been run once (`confirm_nifty_llm_search.py --final-test`, which refuses a second run). Any new search needs a fresh holdout period before its result can be called untouched.
 4. **Feature engineering.** Run it as a separate experiment, now that the loss and weighting choices are settled.
