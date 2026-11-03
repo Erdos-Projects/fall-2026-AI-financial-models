@@ -1,0 +1,456 @@
+{
+ "study": "nifty_llm_search",
+ "smoke": false,
+ "created_at_utc": "2026-11-02T04:06:23.445434+00:00",
+ "research_question": "Can an LLM use model diagnostics to find improvements to the fixed compact MLP more efficiently than conventional tuning, under the same experiment budget?",
+ "reference_model": {
+  "architecture": "compact",
+  "seed": 42,
+  "input_dim": 15,
+  "hidden": [
+   32,
+   16
+  ],
+  "dropout": 0.1,
+  "activation": "ReLU",
+  "output": "unconstrained linear scalar",
+  "parameters": 1057,
+  "checkpoint": "data/processed/nifty_models/frozen_mlp.pt",
+  "checkpoint_sha256": "29623e65552908be9c3a204652b17ed3ed48478c6bad327d9ccc3dae1555c0d6",
+  "best_epoch": 1,
+  "feature_columns": [
+   "log_close",
+   "log_strike",
+   "log_volume",
+   "log_high_low",
+   "log_close_open",
+   "return_1m",
+   "return_5m",
+   "return_std_5m",
+   "log_mean_volume_6bars",
+   "minute_sin",
+   "minute_cos",
+   "is_call",
+   "zero_volume",
+   "close_at_most_1",
+   "flat_ohlc"
+  ],
+  "target_scale": 0.07981475234487422,
+  "target_center": 0.0,
+  "preprocessing_manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+  "selection_rule": "Smallest parameter count within 0.5% of the lowest three-seed mean val_day_mae",
+  "reference_seed_predeclared": true,
+  "test_evaluated": false,
+  "llm_executed": false
+ },
+ "arms": {
+  "gpt_hypotheses": "GPT's three predeclared first hypotheses, one change each from the baseline (3 fixed trials)",
+  "random": "Uniform random search over the shared space",
+  "bayes": "Optuna Gaussian-process Bayesian optimization (GPSampler; 3 random starts after the shared baseline)",
+  "llm_batch": "LLM proposes every configuration at once from the diagnostic brief, without feedback",
+  "llm_feedback": "LLM proposes one configuration at a time and receives measured diagnostic feedback"
+ },
+ "budget_per_search": 12,
+ "gpt_hypotheses_trials": 3,
+ "repeats": "The pilot runs repeat 1 of every arm. Further repeats reuse this protocol with new random/GP seeds and fresh LLM conversations; gpt_hypotheses is fixed and runs once.",
+ "search": {
+  "plan": "search",
+  "seed": 42,
+  "windows": [
+   {
+    "fit": {
+     "first_date": "2016-12-14",
+     "last_date": "2018-08-21",
+     "dates": 420,
+     "rows": 4185012
+    },
+    "tune": {
+     "first_date": "2018-08-23",
+     "last_date": "2018-10-23",
+     "dates": 40,
+     "rows": 476162
+    },
+    "score": {
+     "first_date": "2018-10-24",
+     "last_date": "2019-02-18",
+     "dates": 80,
+     "rows": 826101
+    }
+   },
+   {
+    "fit": {
+     "first_date": "2016-12-14",
+     "last_date": "2018-12-21",
+     "dates": 500,
+     "rows": 5083295
+    },
+    "tune": {
+     "first_date": "2018-12-24",
+     "last_date": "2019-02-18",
+     "dates": 40,
+     "rows": 403980
+    },
+    "score": {
+     "first_date": "2019-02-19",
+     "last_date": "2019-06-19",
+     "dates": 80,
+     "rows": 729987
+    }
+   },
+   {
+    "fit": {
+     "first_date": "2016-12-14",
+     "last_date": "2019-04-18",
+     "dates": 580,
+     "rows": 5889562
+    },
+    "tune": {
+     "first_date": "2019-04-22",
+     "last_date": "2019-06-19",
+     "dates": 40,
+     "rows": 327700
+    },
+    "score": {
+     "first_date": "2019-06-20",
+     "last_date": "2019-10-17",
+     "dates": 80,
+     "rows": 852660
+    }
+   }
+  ],
+  "objective": "Mean over the three folds of score-window equal-date MAE in log-return units",
+  "baseline": "Trial 0 evaluates the baseline configuration once; every arm sees or uses it"
+ },
+ "fixed_training": {
+  "hidden": [
+   32,
+   16
+  ],
+  "activation": "ReLU",
+  "batch_size": 4096,
+  "max_epochs": 12,
+  "early_stopping_patience": 3,
+  "early_stopping_min_delta": 1e-06,
+  "optimizer": "AdamW",
+  "lr_schedule": "ReduceLROnPlateau(factor=0.5, patience=1, min_lr=1e-5) on the tune objective",
+  "gradient_clip_norm": 1.0,
+  "output_initialization": "zero weights and bias, i.e. persistence before training",
+  "train_probe_rows": 65536,
+  "train_probe_seed": 9102
+ },
+ "search_space": {
+  "loss": {
+   "choices": [
+    "smooth_l1",
+    "l1",
+    "mse"
+   ],
+   "baseline": "smooth_l1",
+   "meaning": "Training loss on the scaled target y / std(y_fit)"
+  },
+  "smooth_l1_beta": {
+   "low": 0.01,
+   "high": 10.0,
+   "log": true,
+   "baseline": 1.0,
+   "meaning": "Smooth L1 transition point in scaled-target units; ignored unless loss is smooth_l1"
+  },
+  "learning_rate": {
+   "low": 0.0001,
+   "high": 0.01,
+   "log": true,
+   "baseline": 0.001,
+   "meaning": "Initial AdamW learning rate"
+  },
+  "weight_decay": {
+   "low": 1e-06,
+   "high": 0.1,
+   "log": true,
+   "baseline": 0.0001,
+   "meaning": "AdamW decoupled weight decay"
+  },
+  "dropout": {
+   "low": 0.0,
+   "high": 0.5,
+   "log": false,
+   "baseline": 0.1,
+   "meaning": "Dropout probability after each hidden ReLU layer"
+  },
+  "sample_weighting": {
+   "choices": [
+    "none",
+    "date_balanced"
+   ],
+   "baseline": "none",
+   "meaning": "none weights fit rows equally; date_balanced gives every fit date equal total weight"
+  },
+  "low_price_weight": {
+   "low": 0.01,
+   "high": 1.0,
+   "log": true,
+   "baseline": 1.0,
+   "meaning": "Multiplies the training weight of rows with current close <= 1; weights are renormalized to mean 1"
+  },
+  "calibration": {
+   "choices": [
+    "none",
+    "global_scale",
+    "price_group_scale"
+   ],
+   "baseline": "none",
+   "meaning": "Post-training prediction multiplier alpha in [0, 1] fitted on the tune window to minimize equal-date MAE; price_group_scale fits separate alphas for close <= 1 and close > 1"
+  }
+ },
+ "baseline_config": {
+  "loss": "smooth_l1",
+  "smooth_l1_beta": 1.0,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "dropout": 0.1,
+  "sample_weighting": "none",
+  "low_price_weight": 1.0,
+  "calibration": "none"
+ },
+ "proposers": {
+  "random": "numpy default_rng([repeat, trial]); uniform choices, (log-)uniform ranges",
+  "bayes": {
+   "library": "optuna 4.9.0",
+   "sampler": "GPSampler",
+   "n_startup_trials": 4,
+   "seed": "1000 * repeat + trial",
+   "observations": "baseline plus every evaluated trial of the same search"
+  },
+  "gpt_hypotheses": [
+   {
+    "hypothesis": "Training weights individual observations equally, while the selection metric weights dates equally; aligning the training weights with the metric should lower equal-date MAE.",
+    "change": "sample_weighting: none -> date_balanced",
+    "expected_effect": "Lower equal-date MAE, possibly with a small pooled-RMSE cost.",
+    "rejection_criterion": "Objective not lower than the baseline configuration.",
+    "config": {
+     "loss": "smooth_l1",
+     "smooth_l1_beta": 1.0,
+     "learning_rate": 0.001,
+     "weight_decay": 0.0001,
+     "dropout": 0.1,
+     "sample_weighting": "date_balanced",
+     "low_price_weight": 1.0,
+     "calibration": "none"
+    }
+   },
+   {
+    "hypothesis": "The MLP improves large-error behaviour but slightly worsens MAE, so its predictions need shrinkage toward persistence: adjusted = alpha * prediction with 0 <= alpha <= 1.",
+    "change": "calibration: none -> global_scale",
+    "expected_effect": "Lower equal-date MAE while keeping part of the RMSE gain.",
+    "rejection_criterion": "Objective not lower than baseline; alpha = 0 would instead support persistence.",
+    "config": {
+     "loss": "smooth_l1",
+     "smooth_l1_beta": 1.0,
+     "learning_rate": 0.001,
+     "weight_decay": 0.0001,
+     "dropout": 0.1,
+     "sample_weighting": "none",
+     "low_price_weight": 1.0,
+     "calibration": "global_scale"
+    }
+   },
+   {
+    "hypothesis": "Almost all squared-error improvement comes from options priced at or below one, so the two price groups need separate calibration coefficients.",
+    "change": "calibration: none -> price_group_scale",
+    "expected_effect": "Lower equal-date MAE than one global coefficient.",
+    "rejection_criterion": "Objective not lower than the global_scale hypothesis or the baseline.",
+    "config": {
+     "loss": "smooth_l1",
+     "smooth_l1_beta": 1.0,
+     "learning_rate": 0.001,
+     "weight_decay": 0.0001,
+     "dropout": 0.1,
+     "sample_weighting": "none",
+     "low_price_weight": 1.0,
+     "calibration": "price_group_scale"
+    }
+   }
+  ],
+  "llm": {
+   "backend": "manual file handoff (no API)",
+   "repair_rounds": 1,
+   "relay_instructions": "Paste each prompt into a NEW temporary chat with memory/personalization off and no browsing or code tools; return the reply verbatim and record the model name.",
+   "batch": "one prompt asks for all proposals at once; no results are shown",
+   "feedback": "one prompt per proposal containing every earlier result of the same search"
+  }
+ },
+ "rules": [
+  "Invalid proposals (after one repair round) and duplicates consume budget",
+  "Duplicates of the baseline or of an earlier trial in the same search are not retrained",
+  "Identical configurations proposed by different arms reuse the cached result but are charged its original training time and epochs",
+  "LLM text never supplies labels or metrics; Python computes every reported number",
+  "No prompt contains test-period data or results; the search opens only training dates"
+ ],
+ "confirmation": {
+  "plan": "validation",
+  "seeds": [
+   17,
+   42,
+   2026
+  ],
+  "window": {
+   "fit": "2016-12-14 to 2019-08-16 (training dates 0-659)",
+   "tune": "2019-08-19 to 2019-10-17 (training dates 660-699)",
+   "score": "the 150 original validation dates (2019-10-18 to 2020-05-29)"
+  },
+  "selection": "Per arm and repeat, the evaluated trial with the lowest search objective; ties -> earliest",
+  "comparators": [
+   "baseline configuration under the identical plan and seeds",
+   "persistence",
+   "frozen checkpoint (early-stopped on these dates; reference only)"
+  ],
+  "uncertainty": "Paired circular block bootstrap over validation dates (block 5, 2000 resamples, seed 8801) of seed-averaged daily MAE differences versus the baseline configuration"
+ },
+ "final_test": {
+  "plan": "test",
+  "status": "Not run. Requires explicit approval after confirmation; each frozen selection is then refit on dates 0-809, tuned on 810-849, and scored once on the reserved June-December 2020 dates"
+ },
+ "analysis": {
+  "primary_search": "Best-so-far objective after each proposal, and its mean over proposals 1..budget",
+  "primary_confirmation": "Seed-mean validation equal-date MAE change versus the baseline configuration",
+  "secondary": [
+   "training epochs and seconds per arm",
+   "valid, invalid and duplicate proposal counts",
+   "LLM prompt/reply characters (tokens estimated as characters / 4)",
+   "Spearman correlation of LLM predicted_change_pct with measured change",
+   "subgroup, price-error and RMSE side effects of the selected configurations"
+  ]
+ },
+ "caveats": [
+  "The loss choice l1 lies inside the space, so random sampling reaches it with probability 1/3 per draw; the LLM's value may appear as efficiency rather than discovery.",
+  "One search per arm is a pilot: it cannot separate method quality from search luck.",
+  "Search uses one training seed. The compact baseline's seed SD of validation equal-date MAE was 0.0000074 (about 0.05%), so smaller differences are within optimization noise.",
+  "The original validation dates already guided architecture selection and are summarized in the LLM brief, so confirmation there remains a development estimate.",
+  "Manual relay latency includes human time and is not a model-latency measurement."
+ ],
+ "brief_inputs": {
+  "data": {
+   "dates": 700,
+   "first_date": "2016-12-14",
+   "last_date": "2019-10-17",
+   "rows": 7069922,
+   "rows_per_date_min": 2042,
+   "rows_per_date_median": 8747,
+   "rows_per_date_max": 32794
+  },
+  "features": {
+   "log_close": "ln(close[t])",
+   "log_strike": "ln(strike)",
+   "log_volume": "ln(1 + reported volume[t]); units unverified",
+   "log_high_low": "ln(high[t]/low[t]); bar range, not bid-ask spread",
+   "log_close_open": "ln(close[t]/open[t])",
+   "return_1m": "ln(close[t]/close[t-1])",
+   "return_5m": "ln(close[t]/close[t-5])",
+   "return_std_5m": "Population standard deviation of five one-minute returns from t-4 through t",
+   "log_mean_volume_6bars": "ln(1 + mean(reported volume[t-5:t]))",
+   "minute_sin": "sin(2*pi*source minute of day/1440)",
+   "minute_cos": "cos(2*pi*source minute of day/1440)",
+   "is_call": "1 for CE, 0 for PE",
+   "zero_volume": "1 if reported volume[t] = 0",
+   "close_at_most_1": "1 if close[t] <= 1",
+   "flat_ohlc": "1 if all OHLC[t] equal"
+  },
+  "target_profile": {
+   "first_date": "2016-12-14",
+   "last_date": "2018-08-21",
+   "dates": 420,
+   "rows": 4185012,
+   "std": 0.09779674313732103,
+   "mean": -0.0002776057846552137,
+   "share_exact_zero": 0.1676446805887295,
+   "abs_max": 7.4193806648254395,
+   "abs_quantiles": {
+    "0.5": 0.006483558099716902,
+    "0.75": 0.014263463206589222,
+    "0.9": 0.026727648451924324,
+    "0.95": 0.03973125293850899,
+    "0.99": 0.10863383859395981,
+    "0.999": 1.27701997756958
+   },
+   "groups": {
+    "close_at_most_1": {
+     "share_rows": 0.02695762879532962,
+     "std": 0.3209752544949292,
+     "mean_abs": 0.09174733534896451,
+     "share_exact_zero": 0.6643088868797532
+    },
+    "close_above_1": {
+     "share_rows": 0.9730423712046704,
+     "std": 0.0835038868173542,
+     "mean_abs": 0.013958972504423885,
+     "share_exact_zero": 0.1538848591201696
+    }
+   }
+  },
+  "earlier_findings": {
+   "dates": 150,
+   "first_date": "2019-10-18",
+   "last_date": "2020-05-29",
+   "day_mae": 0.20561459736929688,
+   "mae": 0.30263351898653923,
+   "rmse": -5.063115806367868,
+   "price_mae": 0.6256397722144147,
+   "price_rmse": 1.193123138113128,
+   "dates_better": 41,
+   "low_price_share": 0.022913517542384434,
+   "low_price_mae": 0.06619682076156597,
+   "low_price_rmse": -8.02322409684172,
+   "high_price_mae": 0.34787606462252096,
+   "high_price_rmse": -0.1018215461866423,
+   "low_price_share_of_squared_error_reduction": 0.992493026013701,
+   "sources": [
+    "reports/nifty_baseline_performance/summary.json",
+    "reports/nifty_mlp_study/subgroups.csv"
+   ]
+  }
+ },
+ "replication": {
+  "plan": "replication",
+  "seed": 42,
+  "best_epoch": 1,
+  "epochs_run": 4,
+  "predictions_bitwise_identical": true,
+  "weights_bitwise_identical": true,
+  "reference_checkpoint_sha256": "29623e65552908be9c3a204652b17ed3ed48478c6bad327d9ccc3dae1555c0d6"
+ },
+ "signature": {
+  "sources": {
+   "scripts/nifty_models.py": "604ab30dc253b9a1978ef799e845a21505ad7e7ae2499e0e3d0ee87c64959fbe",
+   "scripts/nifty_search_space.py": "a43a34db5331d3610288f47f7a9340ea64a879e92eeb689a0024e69c091f84b2",
+   "scripts/nifty_search_runner.py": "8ae65338547dc282fd8c305233f17d242d9a95babbc0037636c6ffbad47926e8",
+   "scripts/nifty_proposers.py": "0d468081b54fafa278f8905f41640347227dc69aa009dbcaf05b73add9fe2b4c",
+   "scripts/run_nifty_llm_search.py": "4e089ed8f61a4d107da2116268037c3af29ec5d9c84892d56399ebfb32daa693"
+  },
+  "max_epochs": 12,
+  "row_limit": null,
+  "threads": 4,
+  "versions": {
+   "torch": "2.2.2",
+   "numpy": "1.26.4",
+   "pandas": "2.3.3",
+   "optuna": "4.9.0"
+  }
+ },
+ "preprocessing_manifest_sha256": "9c501cb5a338953ad67d45153e8644349ef4addf86effb6ee2afb7ddd7467760",
+ "inputs": {
+  "train/X.npy": "b3c12c83e09aa9cd31c1c174b736c9e5ce8e32a9354aa9b256e2647a1a9f0d2f",
+  "train/y.npy": "974370b0e1c59afad7e2f0956b1db7a774beb2f4de95e7a1507d4b8c01ff562e",
+  "train/metadata.parquet": "c5884b968c35043df33769f80dd4c849a99b220f7a01455b6a1a260812f27b1c",
+  "valid/X.npy": "bc1e75a5d0f24f065b4741db2dce8bdfc2ecbcebcdd27601afea717253b4092f",
+  "valid/y.npy": "ea95f3f66a92bf44fc9c70c7855db0325375022f9af590d435507ef01030987a",
+  "valid/metadata.parquet": "13aa522f2a6214c8e2d92ed11d22f6644670c9f084665c5edbdd5d7274eef809",
+  "feature_spec.json": "41a1983e555d8f96ea47a8d06bcbc96e29fa0f585f9d163920b6fa51e1d464fd",
+  "scaler.json": "aca710362ce897800020571e691f4c3a6c64c7da7eb14e5cfc9697af4ec45e6c"
+ },
+ "hardware": {
+  "system": "Darwin",
+  "machine": "x86_64",
+  "logical_cpus": 16,
+  "torch_threads": 4
+ },
+ "test_evaluated": false
+}

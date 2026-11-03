@@ -1,0 +1,30 @@
+{
+ "arm": "baseline",
+ "repeat": 0,
+ "trial": 0,
+ "config": {
+  "loss": "smooth_l1",
+  "smooth_l1_beta": 1.0,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "dropout": 0.1,
+  "sample_weighting": "none",
+  "low_price_weight": 1.0,
+  "calibration": "none"
+ },
+ "config_hash": "a5a698040308072e",
+ "changed_from_baseline": [],
+ "proposal": null,
+ "proposer": null,
+ "llm": null,
+ "status": "evaluated",
+ "duplicate_of": null,
+ "objective": 0.014448371477324216,
+ "error": null,
+ "train_seconds": 40.34389306907542,
+ "epochs": 12,
+ "cache_hit": false,
+ "evaluation_seconds": 40.94005262805149,
+ "result_path": "results/search/seed42/a5a698040308072e.json",
+ "recorded_at_utc": "2026-11-02T04:07:04.759270+00:00"
+}
